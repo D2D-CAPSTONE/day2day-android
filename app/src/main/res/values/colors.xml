@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="pink_light">#FFFFB3D9</color>
+    <color name="pink_primary">#FFFFB6D9</color>
+    <color name="pink_dark">#FFFF99CC</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="splash_background">#FFFFB6D9</color>
+    <color name="splash_text">#FFFFFFFF</color>
+    <color name="main_background">#FFFAFAFA</color>
+    <color name="main_text">#FF333333</color>
+    <color name="main_subtitle">#FF999999</color>
+    <color name="button_color">#FFFFB6D9</color>
+    <color name="button_text">#FFFFFFFF</color>
+</resources>
