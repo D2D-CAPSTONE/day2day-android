@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.spotless)
 }
 
 android {
@@ -41,4 +42,17 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+}
+
+spotless {
+    java {
+        target("src/**/*.java")
+        googleJavaFormat("1.25.2")
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    dependsOn("spotlessApply")
 }
