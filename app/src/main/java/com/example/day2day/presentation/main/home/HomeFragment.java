@@ -12,8 +12,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.day2day.R;
-import com.example.day2day.presentation.recommend.location.LocationCourseActivity;
-import com.example.day2day.presentation.recommend.nearby.NearbyCourseActivity;
+import com.example.day2day.presentation.recommend.flow.MapPageActivity;
+import com.example.day2day.presentation.recommend.flow.MapSelectionActivity;
 
 public class HomeFragment extends Fragment {
     @Nullable
@@ -31,8 +31,8 @@ public class HomeFragment extends Fragment {
         Button locationButton = view.findViewById(R.id.btn_location_course);
 
         nearbyButton.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), NearbyCourseActivity.class)));
+                startActivity(new Intent(requireContext(), MapSelectionActivity.class)));
         locationButton.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), LocationCourseActivity.class)));
+                startActivity(new Intent(requireContext(), MapPageActivity.class)));
     }
 }

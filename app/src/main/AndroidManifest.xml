@@ -13,11 +13,23 @@
         android:theme="@style/Theme.Day2day">
 
         <activity
-            android:name=".presentation.recommend.location.LocationCourseActivity"
+            android:name=".presentation.recommend.flow.CourseDetailPageActivity"
             android:exported="false" />
 
         <activity
-            android:name=".presentation.recommend.nearby.NearbyCourseActivity"
+            android:name=".presentation.recommend.flow.CourseMapPageActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.recommend.flow.FilteringActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.recommend.flow.MapPageActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.recommend.flow.MapSelectionActivity"
             android:exported="false" />
 
         <activity

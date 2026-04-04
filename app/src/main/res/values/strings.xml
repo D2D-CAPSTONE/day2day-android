@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">day2day</string>
-    <string name="start_button">시작하기</string>
-    <string name="start_title">DAY2DAY</string>
-    <string name="logo_content_description">앱 로고</string>
 </resources>
