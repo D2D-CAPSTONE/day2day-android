@@ -18,14 +18,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
-import androidx.transition.TransitionManager;
 import com.example.day2day.R;
+import com.example.day2day.presentation.recommend.flow.CourseDetailPageActivity;
 import com.example.day2day.presentation.recommend.flow.MapPageActivity;
 import com.example.day2day.presentation.recommend.flow.MapSelectionActivity;
 
 public class HomeFragment extends Fragment {
 
-  private static final int SCROLL_THRESHOLD_DP = 50;
+  private static final int SCROLL_THRESHOLD_DP = 100;
 
   // {title, spots(comma), tags(comma), rating, thumbBgColor, iconColor}
   private static final String[][] COURSES = {
@@ -34,18 +34,22 @@ public class HomeFragment extends Fragment {
     {"경복궁 고즈넉 데이트", "경복궁,북촌 한옥마을,인사동", "조용한,문화", "★ 4.7", "#fdf8f0", "#c97a30"},
     {"성수동 힙스터 코스", "성수 브런치,대림창고,서울숲", "힙한,브런치", "★ 4.5", "#eff4ff", "#5078c8"},
     {"이태원 글로벌 데이트", "경리단길,이태원 바,N서울타워", "야경,글로벌", "★ 4.4", "#effaf4", "#2a9050"},
+    {"북촌 한옥 산책 코스", "경복궁역,북촌 한옥마을,삼청동", "조용한,힐링", "★ 4.6", "#f5f0ff", "#7c4dcc"},
+    {"망원동 감성 코스", "망원한강공원,망원시장,연남동", "야외,로컬", "★ 4.3", "#fff8f0", "#e07820"},
+    {"을지로 레트로 코스", "을지로 카페골목,광장시장,청계천", "힙한,레트로", "★ 4.5", "#f0fff4", "#2a8a50"},
+    {"서촌 골목 데이트", "통인시장,서촌 카페,경복궁", "조용한,문화", "★ 4.4", "#fff0f5", "#d04070"},
+    {"강남 세련 데이트", "코엑스,압구정 로데오,청담동", "세련된,쇼핑", "★ 4.3", "#f0f5ff", "#3060c0"},
   };
 
+  private View weatherBanner;
   private View weatherFull;
   private View weatherMini;
-  private View courseFindSection;
   private LinearLayout courseList;
   private View loadMore;
-  private ViewGroup rootView;
 
+  private int weatherBannerFullHeight = 0;
   private int currentPage = 0;
-  private static final int PER_PAGE = 3;
-  private boolean isMini = false;
+  private static final int PER_PAGE = 5;
 
   @Nullable
   @Override
@@ -59,8 +63,6 @@ public class HomeFragment extends Fragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    rootView = (ViewGroup) view;
-
     // Styled app title: "day[to]day"
     TextView tvTitle = view.findViewById(R.id.tv_app_title);
     SpannableString title = new SpannableString("daytoday");
@@ -72,46 +74,53 @@ public class HomeFragment extends Fragment {
     tvTitle.setText(title);
 
     // Weather banner views
+    weatherBanner = view.findViewById(R.id.weather_banner);
     weatherFull = view.findViewById(R.id.weather_full);
     weatherMini = view.findViewById(R.id.weather_mini);
-    courseFindSection = view.findViewById(R.id.course_find_section);
     courseList = view.findViewById(R.id.course_list);
     loadMore = view.findViewById(R.id.load_more);
+
+    // weatherMini를 처음부터 visible로 두고 alpha로 제어
+    weatherMini.setVisibility(View.VISIBLE);
+    weatherMini.setAlpha(0f);
+
+    // 배너 전체 높이 측정 (레이아웃 완료 후)
+    weatherBanner.post(() -> weatherBannerFullHeight = weatherBanner.getHeight());
 
     // Course finder buttons
     view.findViewById(R.id.btn_nearby_course)
         .setOnClickListener(
-            v -> startActivity(new Intent(requireContext(), MapSelectionActivity.class)));
+            v -> startActivity(new Intent(requireContext(), MapPageActivity.class)));
     view.findViewById(R.id.btn_location_course)
         .setOnClickListener(
-            v -> startActivity(new Intent(requireContext(), MapPageActivity.class)));
+            v -> startActivity(new Intent(requireContext(), MapSelectionActivity.class)));
 
-    // Scroll listener: collapse/expand weather banner
+    // Scroll listener: 스크롤 위치에 비례해 배너 높이·알파 보간
     NestedScrollView scrollBody = view.findViewById(R.id.scroll_body);
     float threshold =
         SCROLL_THRESHOLD_DP * requireContext().getResources().getDisplayMetrics().density;
+    int miniHeight = dpToPx(52);
 
     scrollBody.setOnScrollChangeListener(
         (NestedScrollView.OnScrollChangeListener)
             (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-              if (scrollY > threshold && !isMini) {
-                isMini = true;
-                TransitionManager.beginDelayedTransition(rootView);
-                weatherFull.setVisibility(View.GONE);
-                weatherMini.setVisibility(View.VISIBLE);
-                courseFindSection.setVisibility(View.GONE);
-              } else if (scrollY <= threshold && isMini) {
-                isMini = false;
-                TransitionManager.beginDelayedTransition(rootView);
-                weatherFull.setVisibility(View.VISIBLE);
-                weatherMini.setVisibility(View.GONE);
-                courseFindSection.setVisibility(View.VISIBLE);
+              if (weatherBannerFullHeight > 0) {
+                float fraction = Math.min(1f, Math.max(0f, scrollY / threshold));
+
+                weatherFull.setAlpha(1f - fraction);
+                weatherMini.setAlpha(fraction);
+
+                int h =
+                    (int)
+                        (weatherBannerFullHeight
+                            + (miniHeight - weatherBannerFullHeight) * fraction);
+                ViewGroup.LayoutParams lp = weatherBanner.getLayoutParams();
+                lp.height = h;
+                weatherBanner.requestLayout();
               }
 
               // Lazy load more courses near bottom
-              View inner = v.getChildAt(0);
-              if (inner != null
-                  && scrollY + v.getMeasuredHeight() >= inner.getMeasuredHeight() - 100) {
+              if (!v.canScrollVertically(1)) {
                 loadMoreCourses();
               }
             });
@@ -184,6 +193,10 @@ public class HomeFragment extends Fragment {
 
     // Rating
     ((TextView) card.findViewById(R.id.cc_rating)).setText(course[3]);
+
+    // Navigate to course detail on card click
+    card.setOnClickListener(
+        v -> startActivity(new Intent(requireContext(), CourseDetailPageActivity.class)));
 
     // Thumb background (rounded rect, per-course color)
     FrameLayout thumb = card.findViewById(R.id.cc_thumb);
