@@ -24,7 +24,7 @@
             android:id="@+id/iv_logo"
             android:layout_width="196dp"
             android:layout_height="195dp"
-            android:contentDescription="@string/logo_content_description"
+            android:contentDescription="앱 로고"
             android:src="@mipmap/ic_launcher" />
 
         <TextView
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/start_title"
+            android:text="DAY2DAY"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="32dp"
-        android:text="@string/start_button"
+        android:text="시작하기"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
