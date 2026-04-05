@@ -8,9 +8,7 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import com.example.day2day.R;
 import com.example.day2day.presentation.main.MainActivity;
 
@@ -18,13 +16,6 @@ public class StartActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
-    // Splash theme uses fullscreen. Ensure status bar is visible again from here.
-    WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
-    WindowInsetsControllerCompat controller =
-        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-    controller.show(WindowInsetsCompat.Type.statusBars());
-    controller.show(WindowInsetsCompat.Type.navigationBars());
 
     setContentView(R.layout.activity_start);
 
