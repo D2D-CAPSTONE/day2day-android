@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--스플래시 화면 그라데이션 배경-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="135"
+        android:startColor="#E8506A"
+        android:endColor="#F4A0B0" />
+</shape>

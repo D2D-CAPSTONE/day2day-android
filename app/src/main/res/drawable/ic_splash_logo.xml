@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--스플래시 화면 지도 모양 아이콘-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="28"
+    android:viewportHeight="28">
+
+    <path
+        android:fillColor="#66F4A0B0"
+        android:pathData="M14,18m-7,0a7,7 0,1 1,14 0a7,7 0,1 1,-14 0" />
+    <path
+        android:fillColor="#E8506A"
+        android:pathData="M14,5C10.5,5 8,7.5 8,11C8,15.5 14,23 14,23C14,23 20,15.5 20,11C20,7.5 17.5,5 14,5Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14,11m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+</vector>
