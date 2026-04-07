@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--스플래시 화면 아이콘 뒤 하얀 배경-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFFCFA" />
+    <corners android:radius="24dp" />
+</shape>
