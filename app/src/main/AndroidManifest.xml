@@ -55,8 +55,8 @@
             android:theme="@style/Theme.Day2day.Main" />
 
         <meta-data
-            android:name="com.naver.maps.map.CLIENT_ID"
-            android:value="" />
+            android:name="com.naver.maps.map.NCP_KEY_ID"
+            android:value="rfoug2ufoy" />
 
     </application>
 
