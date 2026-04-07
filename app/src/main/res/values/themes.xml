@@ -13,6 +13,7 @@
         <item name="colorPrimaryVariant">@color/pink_dark</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+    </style>
     <!-- Main Activity Theme (no action bar, custom top bar in fragment) -->
     <style name="Theme.Day2day.Main" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="colorPrimary">@color/rose</item>
