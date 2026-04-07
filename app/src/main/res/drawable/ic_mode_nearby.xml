@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="52dp"
+    android:height="52dp"
+    android:viewportWidth="52"
+    android:viewportHeight="52">
+    <!-- Background circle -->
+    <path
+        android:fillColor="#fce8ec"
+        android:pathData="M2,26 a24,24 0 1,0 48,0 a24,24 0 1,0 -48,0" />
+    <!-- Dashed ring (simplified as thin solid ring) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M11,28 a15,15 0 1,0 30,0 a15,15 0 1,0 -30,0"
+        android:strokeAlpha="0.5"
+        android:strokeColor="#f4a0b0"
+        android:strokeWidth="1" />
+    <!-- Location pin -->
+    <path
+        android:fillColor="#e8506a"
+        android:pathData="M26,15 C22,15 19,18 19,22 C19,26.5 26,35 26,35 C26,35 33,26.5 33,22 C33,18 30,15 26,15Z" />
+    <!-- White dot in pin -->
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M22.5,22 a3.5,3.5 0 1,0 7,0 a3.5,3.5 0 1,0 -7,0" />
+</vector>
