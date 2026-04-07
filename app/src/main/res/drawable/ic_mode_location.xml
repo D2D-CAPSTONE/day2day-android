@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="52dp"
+    android:height="52dp"
+    android:viewportWidth="52"
+    android:viewportHeight="52">
+    <!-- Background circle -->
+    <path
+        android:fillColor="#fff5f7"
+        android:pathData="M2,26 a24,24 0 1,0 48,0 a24,24 0 1,0 -48,0" />
+    <!-- Dashed path between pins (simplified) -->
+    <path
+        android:fillColor="@android:color/transparent"
+        android:pathData="M17,32 Q22,24 35,20"
+        android:strokeAlpha="0.6"
+        android:strokeColor="#f4a0b0"
+        android:strokeLineCap="round"
+        android:strokeWidth="1.5" />
+    <!-- Pin 1 (bottom-left, rose) -->
+    <path
+        android:fillColor="#e8506a"
+        android:pathData="M17,35 C15,35 13.5,33.5 13.5,32 C13.5,30 17,26.5 17,26.5 C17,26.5 20.5,30 20.5,32 C20.5,33.5 19,35 17,35Z" />
+    <path
+        android:fillColor="#ffffff"
+        android:pathData="M15.2,32 a1.8,1.8 0 1,0 3.6,0 a1.8,1.8 0 1,0 -3.6,0" />
+    <!-- Pin 2 (top-right, lighter) -->
+    <path
+        android:fillColor="#f4a0b0"
+        android:pathData="M35,23 C33,23 31.5,21.5 31.5,20 C31.5,18 35,14.5 35,14.5 C35,14.5 38.5,18 38.5,20 C38.5,21.5 37,23 35,23Z" />
+</vector>

@@ -7,6 +7,15 @@
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
     </style>
 
+    <!-- Main Activity Theme (no action bar, custom top bar in fragment) -->
+    <style name="Theme.Day2day.Main" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/rose</item>
+        <item name="colorPrimaryVariant">@color/rose_medium</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:statusBarColor">@color/rose</item>
+        <item name="android:navigationBarColor">@color/cream</item>
+    </style>
+
     <!-- Splash Screen Theme -->
     <style name="Theme.Day2day.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowNoTitle">true</item>
