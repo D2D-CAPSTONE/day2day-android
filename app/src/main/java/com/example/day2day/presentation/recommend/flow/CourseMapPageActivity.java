@@ -17,7 +17,6 @@ public class CourseMapPageActivity extends AppCompatActivity {
     View rootView = findViewById(android.R.id.content);
     Button nextButton = findViewById(R.id.btn_course_map_page_next);
     NavigationBarInsetHelper.applyBottomInset(rootView, nextButton);
-
     nextButton.setOnClickListener(
         v -> startActivity(new Intent(CourseMapPageActivity.this, CourseDetailPageActivity.class)));
   }

@@ -38,10 +38,14 @@ android {
 
 dependencies {
     implementation(libs.appcompat)
+    implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     implementation(libs.material)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("com.naver.maps:map-sdk:3.23.2")
 }
 
 spotless {

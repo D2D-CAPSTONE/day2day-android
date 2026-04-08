@@ -1,30 +1,342 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background"
-    android:padding="24dp">
+    android:background="#FAF5F0"
+    android:fitsSystemWindows="true"
+    tools:ignore="HardcodedText">
 
-    <TextView
-        android:id="@+id/tv_filtering"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="필터링 페이지"
-        android:textColor="@color/main_text"
-        android:textSize="26sp"
-        android:textStyle="bold"
+    <LinearLayout
+        android:id="@+id/filtering_header"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="#FFFFFF"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:gravity="center"
+            android:text="×"
+            android:textColor="#2A1F2D"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="필터 설정"
+            android:textColor="#E8506A"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="↺"
+                android:textColor="#706580"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="초기화"
+                android:textColor="#706580"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/filtering_scroll"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="100dp"
         app:layout_constraintBottom_toTopOf="@id/btn_filtering_next"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/filtering_header">
 
-    <Button
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:text="데이트 시작 위치"
+                android:textColor="#2A1F2D"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#FFFCFA"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#172A1F2D"
+                app:strokeWidth="1dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="지역이나 장소를 검색하세요"
+                    android:padding="4dp"
+                    app:boxBackgroundMode="none"
+                    app:endIconMode="clear_text"
+                    app:hintTextColor="#B09AB8"
+                    app:startIconDrawable="@android:drawable/ic_menu_search"
+                    app:startIconTint="#B09AB8">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/transparent"
+                        android:inputType="text"
+                        android:padding="16dp"
+                        android:text="서울시 강남구 역삼동"
+                        android:textColor="#2A1F2D"
+                        android:textSize="12sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:text="현재 위치로 설정"
+                android:textColor="#E8506A"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                app:backgroundTint="#FCE8EC"
+                app:cornerRadius="12dp"
+                app:icon="@android:drawable/ic_menu_mylocation"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp"
+                app:iconTint="#E8506A" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="12dp"
+                android:text="원하는 분위기"
+                android:textColor="#2A1F2D"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="8dp"
+                app:singleSelection="false">
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="기념일"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="조용한"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="가성비"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="활동적인"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="분위기 좋은"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#E8506A"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#E8506A"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="비 오는 날"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="인스타 감성"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="넓은 좌석"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+
+                <com.google.android.material.chip.Chip
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="반려동물 동반"
+                    android:textSize="11sp"
+                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipCornerRadius="20dp"
+                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeWidth="1dp"
+                    app:checkedIconVisible="false" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="12dp"
+                android:text="정렬 기준"
+                android:textColor="#2A1F2D"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#FFFCFA"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#172A1F2D"
+                app:strokeWidth="1dp">
+
+                <RadioGroup
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checkedButton="@+id/rb_recommended"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_recommended"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:text="추천순"
+                        android:textColor="#2A1F2D"
+                        android:textSize="12sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#172A1F2D" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:text="거리순"
+                        android:textColor="#2A1F2D"
+                        android:textSize="12sp" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#172A1F2D" />
+
+                    <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:text="찜 많은 순"
+                        android:textColor="#2A1F2D"
+                        android:textSize="12sp" />
+                </RadioGroup>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_filtering_next"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="다음"
+        android:layout_height="52dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="코스 추천받기"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:backgroundTint="#E8506A"
+        app:cornerRadius="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
     <color name="pink_light">#FFFFB3D9</color>
     <color name="pink_primary">#FFFFB6D9</color>
     <color name="pink_dark">#FFFF99CC</color>
@@ -12,4 +17,19 @@
     <color name="main_subtitle">#FF999999</color>
     <color name="button_color">#FFFFB6D9</color>
     <color name="button_text">#FFFFFFFF</color>
+
+    <!-- Design system -->
+    <color name="rose">#e8506a</color>
+    <color name="rose_light">#fce8ec</color>
+    <color name="rose_medium">#f4a0b0</color>
+    <color name="rose_pale">#fff5f7</color>
+    <color name="cream">#fffcfa</color>
+    <color name="warm_bg">#faf5f0</color>
+    <color name="text_dark">#2a1f2d</color>
+    <color name="text_medium">#7a6580</color>
+    <color name="text_light">#b09ab8</color>
+    <color name="sky_blue">#a5d8ff</color>
+    <color name="sky_blue_light">#d0ebff</color>
+    <color name="blue_text">#1864ab</color>
+    <color name="border_color">#172a1f2d</color>
 </resources>
