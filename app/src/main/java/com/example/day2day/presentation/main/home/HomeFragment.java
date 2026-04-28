@@ -85,7 +85,6 @@ public class HomeFragment extends Fragment {
     courseList = view.findViewById(R.id.course_list);
     loadMore = view.findViewById(R.id.load_more);
 
-
     // weatherMini를 처음부터 visible로 두고 alpha로 제어
     weatherMini.setVisibility(View.VISIBLE);
     weatherMini.setAlpha(0f);

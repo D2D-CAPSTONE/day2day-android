@@ -1,0 +1,942 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>Day2Day Android 프로젝트 학습 계획</title>
+<style>
+  @page { margin: 24mm 20mm; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", Arial, sans-serif;
+    color: #1f2933;
+    line-height: 1.62;
+    font-size: 14px;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 28px;
+    background: #ffffff;
+  }
+  h1 {
+    font-size: 30px;
+    margin: 0 0 18px;
+    padding-bottom: 14px;
+    border-bottom: 3px solid #e8506a;
+    color: #111827;
+  }
+  h2 {
+    font-size: 21px;
+    margin-top: 34px;
+    padding-top: 8px;
+    color: #111827;
+    border-top: 1px solid #e5e7eb;
+  }
+  h3 { font-size: 17px; margin-top: 24px; color: #243b53; }
+  p { margin: 9px 0; }
+  ul, ol { margin: 8px 0 14px 24px; padding: 0; }
+  li { margin: 4px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 18px; font-size: 13px; }
+  th, td { border: 1px solid #d9e2ec; padding: 8px 10px; vertical-align: top; }
+  th { background: #f7f9fb; color: #102a43; font-weight: 700; }
+  code {
+    font-family: Menlo, Consolas, monospace;
+    background: #f5f7fa;
+    color: #9f1239;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+  pre {
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 13px 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    line-height: 1.45;
+    font-size: 12.5px;
+  }
+  pre code { background: transparent; color: inherit; padding: 0; }
+  strong { color: #111827; }
+</style>
+</head>
+<body>
+<h1>Day2Day Android 프로젝트 학습 계획</h1>
+<p>이 문서는 <strong>Java 기초 문법만 아는 상태</strong>에서 <code>day2day-android</code> 프로젝트를 이해하기 위한 학습 순서입니다.</p>
+<p>현재 프로젝트는 Java로 작성된 Android 앱이며, 화면은 XML 레이아웃으로 구성되어 있습니다. 빌드는 Gradle Kotlin DSL을 사용하고, UI는 AppCompat, Material Components, ConstraintLayout을 사용합니다. 지도 기능은 Naver Map SDK를 사용할 준비가 되어 있습니다.</p>
+<h2>1. 전체 학습 로드맵</h2>
+<ol>
+<li>Java 기초를 Android 코드 기준으로 복습하기</li>
+<li>Android 프로젝트 구조 이해하기</li>
+<li>Gradle, 의존성, 빌드 설정 이해하기</li>
+<li>XML 레이아웃과 리소스 시스템 이해하기</li>
+<li>Activity와 생명주기 이해하기</li>
+<li>Intent로 화면 이동 이해하기</li>
+<li>Fragment와 BottomNavigationView 이해하기</li>
+<li>View 찾기와 이벤트 처리 이해하기</li>
+<li>Android UI 단위, 스타일, drawable 이해하기</li>
+<li>Insets, 상태바, 네비게이션바 처리 이해하기</li>
+<li>동적 UI 생성 이해하기</li>
+<li>Naver Map SDK와 외부 라이브러리 이해하기</li>
+<li>프로젝트 전체 화면 흐름 정리하기</li>
+<li>직접 수정하며 실습하기</li>
+</ol>
+<h2>2. Java 기초 복습</h2>
+<p>Android 코드를 읽기 위해 Java 문법 전체를 깊게 다시 볼 필요는 없습니다. 이 프로젝트에서 자주 쓰이는 문법을 우선 복습하면 됩니다.</p>
+<h3>2.1 클래스와 상속</h3>
+<p>이 프로젝트의 화면 클래스는 대부분 다음과 같은 형태입니다.</p>
+<pre><code>public class SplashActivity extends AppCompatActivity</code></pre>
+<p><code>SplashActivity</code>는 독립적인 클래스가 아니라 Android가 제공하는 <code>AppCompatActivity</code>를 상속받아 화면 역할을 합니다.</p>
+<p>공부할 개념:</p>
+<ul>
+<li><code>class</code></li>
+<li><code>extends</code></li>
+<li>부모 클래스와 자식 클래스</li>
+<li>메서드 오버라이딩</li>
+<li><code>super</code></li>
+<li><code>public</code>, <code>private</code>, <code>protected</code></li>
+<li><code>final</code></li>
+<li><code>static</code></li>
+</ul>
+<p>관련 파일:</p>
+<ul>
+<li><code>app/src/main/java/com/example/day2day/presentation/splash/SplashActivity.java</code></li>
+<li><code>app/src/main/java/com/example/day2day/presentation/start/StartActivity.java</code></li>
+<li><code>app/src/main/java/com/example/day2day/presentation/main/MainActivity.java</code></li>
+</ul>
+<h3>2.2 익명 클래스와 람다식</h3>
+<p>이 프로젝트에는 익명 클래스와 람다식이 모두 사용됩니다.</p>
+<p>익명 클래스 예시:</p>
+<pre><code>new Runnable() {
+  @Override
+  public void run() {
+    ...
+  }
+}</code></pre>
+<p>람다식 예시:</p>
+<pre><code>v -&gt; startActivity(...)</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li>인터페이스</li>
+<li>익명 클래스</li>
+<li>람다식</li>
+<li>콜백</li>
+<li>이벤트 리스너</li>
+</ul>
+<p>관련 파일:</p>
+<ul>
+<li><code>SplashActivity.java</code></li>
+<li><code>StartActivity.java</code></li>
+<li><code>HomeFragment.java</code></li>
+</ul>
+<h3>2.3 배열과 반복문</h3>
+<p><code>HomeFragment</code>에는 코스 데이터가 2차원 배열로 들어 있습니다.</p>
+<pre><code>private static final String[][] COURSES = {
+  {&quot;홍대 감성 데이트 코스&quot;, ...},
+  ...
+};</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li>1차원 배열</li>
+<li>2차원 배열</li>
+<li><code>for</code> 반복문</li>
+<li>문자열 <code>split</code></li>
+<li>인덱스 접근</li>
+<li><code>static final</code> 상수</li>
+</ul>
+<p>관련 파일:</p>
+<ul>
+<li><code>app/src/main/java/com/example/day2day/presentation/main/home/HomeFragment.java</code></li>
+</ul>
+<h2>3. Android 프로젝트 구조</h2>
+<p>프로젝트 구조는 대략 다음과 같습니다.</p>
+<pre><code>app/
+  src/main/
+    java/com/example/day2day/
+      presentation/
+        splash/
+        start/
+        main/
+        recommend/
+        common/
+    res/
+      layout/
+      drawable/
+      values/
+      menu/
+    AndroidManifest.xml</code></pre>
+<p>각 디렉터리의 역할:</p>
+<table><thead><tr><th>경로</th><th>역할</th></tr></thead><tbody>
+<tr><td><code>java/</code></td><td>Java 코드</td></tr>
+<tr><td><code>res/layout/</code></td><td>화면 XML</td></tr>
+<tr><td><code>res/drawable/</code></td><td>배경, 아이콘, shape</td></tr>
+<tr><td><code>res/values/</code></td><td>색상, 문자열, 테마</td></tr>
+<tr><td><code>res/menu/</code></td><td>하단 네비게이션 메뉴</td></tr>
+<tr><td><code>AndroidManifest.xml</code></td><td>앱 권한, 화면 등록, 시작 화면 설정</td></tr>
+</tbody></table>
+<p>핵심 연결 방식:</p>
+<pre><code>setContentView(R.layout.activity_start);
+Button goMainButton = findViewById(R.id.btn_go_main);</code></pre>
+<p>위 코드는 <code>activity_start.xml</code>을 화면으로 사용하고, 그 XML 안에서 <code>btn_go_main</code>이라는 id를 가진 버튼을 찾는다는 뜻입니다.</p>
+<h2>4. Gradle과 의존성</h2>
+<p>빌드 설정은 다음 파일에 있습니다.</p>
+<ul>
+<li><code>settings.gradle.kts</code></li>
+<li><code>app/build.gradle.kts</code></li>
+</ul>
+<p>주요 설정:</p>
+<pre><code>android {
+    namespace = &quot;com.example.day2day&quot;
+
+    defaultConfig {
+        applicationId = &quot;com.example.day2day&quot;
+        minSdk = 24
+        targetSdk = 36
+    }
+}</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li><code>applicationId</code></li>
+<li><code>namespace</code></li>
+<li><code>minSdk</code></li>
+<li><code>targetSdk</code></li>
+<li><code>compileSdk</code></li>
+<li><code>dependencies</code></li>
+<li><code>implementation</code></li>
+</ul>
+<p>주요 의존성:</p>
+<pre><code>implementation(libs.appcompat)
+implementation(&quot;androidx.constraintlayout:constraintlayout:2.2.1&quot;)
+implementation(libs.material)
+implementation(libs.play.services.maps)
+implementation(&quot;com.naver.maps:map-sdk:3.23.2&quot;)</code></pre>
+<p>의존성 역할:</p>
+<table><thead><tr><th>의존성</th><th>역할</th></tr></thead><tbody>
+<tr><td>AppCompat</td><td>구형 Android와 호환되는 Activity 지원</td></tr>
+<tr><td>ConstraintLayout</td><td>XML 화면 배치</td></tr>
+<tr><td>Material Components</td><td>BottomNavigationView 등 Material UI</td></tr>
+<tr><td>Google Play Services Maps</td><td>지도 관련 기능</td></tr>
+<tr><td>Naver Map SDK</td><td>네이버 지도</td></tr>
+</tbody></table>
+<h2>5. AndroidManifest.xml 이해</h2>
+<p>앱의 전체 등록 정보는 다음 파일에 있습니다.</p>
+<ul>
+<li><code>app/src/main/AndroidManifest.xml</code></li>
+</ul>
+<p>인터넷 권한:</p>
+<pre><code>&lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;</code></pre>
+<p>앱 시작 화면:</p>
+<pre><code>&lt;activity
+    android:name=&quot;.presentation.splash.SplashActivity&quot;
+    android:exported=&quot;true&quot;
+    android:theme=&quot;@style/Theme.Day2day.Splash&quot;&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name=&quot;android.intent.action.MAIN&quot; /&gt;
+        &lt;category android:name=&quot;android.intent.category.LAUNCHER&quot; /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;</code></pre>
+<p>이 설정 때문에 앱을 실행하면 <code>SplashActivity</code>가 가장 먼저 실행됩니다.</p>
+<p>공부할 개념:</p>
+<ul>
+<li><code>manifest</code></li>
+<li><code>application</code></li>
+<li><code>activity</code></li>
+<li><code>intent-filter</code></li>
+<li><code>MAIN</code></li>
+<li><code>LAUNCHER</code></li>
+<li><code>exported</code></li>
+<li><code>theme</code></li>
+<li><code>permission</code></li>
+<li><code>meta-data</code></li>
+</ul>
+<p>Naver Map SDK 키:</p>
+<pre><code>&lt;meta-data
+    android:name=&quot;com.naver.maps.map.NCP_KEY_ID&quot;
+    android:value=&quot;...&quot; /&gt;</code></pre>
+<h2>6. Activity와 생명주기</h2>
+<p>Android에서 화면 하나는 보통 <code>Activity</code>입니다.</p>
+<p>이 프로젝트의 주요 Activity:</p>
+<ul>
+<li><code>SplashActivity</code></li>
+<li><code>StartActivity</code></li>
+<li><code>MainActivity</code></li>
+<li><code>MapPageActivity</code></li>
+<li><code>MapSelectionActivity</code></li>
+<li><code>FilteringActivity</code></li>
+<li><code>CourseMapPageActivity</code></li>
+<li><code>CourseDetailPageActivity</code></li>
+</ul>
+<p>가장 중요한 메서드:</p>
+<pre><code>@Override
+protected void onCreate(Bundle savedInstanceState) {
+  super.onCreate(savedInstanceState);
+  setContentView(...);
+}</code></pre>
+<p><code>onCreate</code>는 화면이 처음 만들어질 때 호출됩니다.</p>
+<p>이 프로젝트에서 <code>onCreate</code>가 하는 일:</p>
+<ul>
+<li>XML 레이아웃 연결</li>
+<li>버튼 찾기</li>
+<li>클릭 이벤트 연결</li>
+<li>화면 이동 설정</li>
+<li>상태바, 네비게이션바 여백 처리</li>
+<li>Fragment 연결</li>
+</ul>
+<p>우선 공부할 생명주기:</p>
+<ol>
+<li><code>onCreate</code></li>
+<li><code>onStart</code></li>
+<li><code>onResume</code></li>
+<li><code>onPause</code></li>
+<li><code>onStop</code></li>
+<li><code>onDestroy</code></li>
+</ol>
+<p>이 프로젝트에서는 먼저 <code>onCreate</code>와 <code>onDestroy</code>를 중심으로 보면 됩니다.</p>
+<h2>7. Intent로 화면 이동 이해</h2>
+<p>Android에서 Activity 간 이동은 <code>Intent</code>로 합니다.</p>
+<p>예시:</p>
+<pre><code>Intent intent = new Intent(SplashActivity.this, StartActivity.class);
+startActivity(intent);
+finish();</code></pre>
+<p>뜻:</p>
+<ul>
+<li><code>SplashActivity</code>에서 <code>StartActivity</code>로 이동한다.</li>
+<li><code>finish()</code>로 현재 Splash 화면을 종료한다.</li>
+</ul>
+<p>기본 화면 흐름:</p>
+<pre><code>SplashActivity
+  -&gt; StartActivity
+      -&gt; MainActivity</code></pre>
+<p>추천 코스 흐름:</p>
+<pre><code>HomeFragment
+  -&gt; MapPageActivity
+      -&gt; FilteringActivity
+          -&gt; CourseMapPageActivity</code></pre>
+<p>장소 선택 흐름:</p>
+<pre><code>HomeFragment
+  -&gt; MapSelectionActivity
+      -&gt; MapPageActivity
+          -&gt; FilteringActivity
+              -&gt; CourseMapPageActivity</code></pre>
+<p>코스 카드 클릭 흐름:</p>
+<pre><code>HomeFragment
+  -&gt; CourseDetailPageActivity
+      -&gt; CourseMapPageActivity</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li><code>Intent</code></li>
+<li><code>startActivity</code></li>
+<li><code>finish</code></li>
+<li>Activity back stack</li>
+<li><code>Intent.FLAG_ACTIVITY_CLEAR_TOP</code></li>
+<li><code>Intent.FLAG_ACTIVITY_SINGLE_TOP</code></li>
+</ul>
+<h2>8. XML 레이아웃 이해</h2>
+<p>이 프로젝트는 화면을 대부분 XML로 만듭니다.</p>
+<p>주요 XML 파일:</p>
+<ul>
+<li><code>activity_splash.xml</code></li>
+<li><code>activity_start.xml</code></li>
+<li><code>activity_main.xml</code></li>
+<li><code>fragment_home.xml</code></li>
+<li><code>item_course_card.xml</code></li>
+<li><code>activity_map_page.xml</code></li>
+<li><code>activity_filtering.xml</code></li>
+<li><code>activity_course_map_page.xml</code></li>
+<li><code>activity_course_detail_page.xml</code></li>
+</ul>
+<p>먼저 익힐 View:</p>
+<ul>
+<li><code>LinearLayout</code></li>
+<li><code>FrameLayout</code></li>
+<li><code>ConstraintLayout</code></li>
+<li><code>NestedScrollView</code></li>
+<li><code>TextView</code></li>
+<li><code>Button</code></li>
+<li><code>ImageView</code></li>
+<li><code>Toolbar</code></li>
+<li><code>BottomNavigationView</code></li>
+</ul>
+<p>먼저 익힐 속성:</p>
+<ul>
+<li><code>android:id</code></li>
+<li><code>layout_width</code></li>
+<li><code>layout_height</code></li>
+<li><code>padding</code></li>
+<li><code>margin</code></li>
+<li><code>background</code></li>
+<li><code>textColor</code></li>
+<li><code>textSize</code></li>
+</ul>
+<p>Activity에서 XML 연결:</p>
+<pre><code>setContentView(R.layout.activity_main);</code></pre>
+<p>Fragment에서 XML 연결:</p>
+<pre><code>return inflater.inflate(R.layout.fragment_home, container, false);</code></pre>
+<p>Activity에서는 보통 <code>findViewById</code>를 바로 사용하지만, Fragment에서는 <code>view.findViewById</code>를 사용합니다.</p>
+<h2>9. Fragment 이해</h2>
+<p><code>MainActivity</code>는 화면 전체를 직접 바꾸는 대신 Fragment를 교체합니다.</p>
+<pre><code>private void showFragment(Fragment fragment) {
+  getSupportFragmentManager()
+      .beginTransaction()
+      .replace(R.id.main_fragment_container, fragment)
+      .commit();
+}</code></pre>
+<p>하단 탭을 누르면 Fragment가 바뀝니다.</p>
+<pre><code>if (itemId == R.id.menu_home) {
+  showFragment(new HomeFragment());
+  return true;
+}</code></pre>
+<p>Fragment 종류:</p>
+<ul>
+<li><code>HomeFragment</code></li>
+<li><code>FavoritesFragment</code></li>
+<li><code>RecordFragment</code></li>
+</ul>
+<p>공부할 개념:</p>
+<ul>
+<li>Activity와 Fragment의 차이</li>
+<li><code>Fragment</code></li>
+<li><code>onCreateView</code></li>
+<li><code>onViewCreated</code></li>
+<li><code>FragmentManager</code></li>
+<li><code>FragmentTransaction</code></li>
+<li><code>replace</code></li>
+<li><code>commit</code></li>
+<li>Fragment container</li>
+</ul>
+<p>이 프로젝트 기준으로 보면 <code>MainActivity</code>는 큰 틀이고, <code>HomeFragment</code>, <code>FavoritesFragment</code>, <code>RecordFragment</code>는 그 안에 끼워지는 작은 화면입니다.</p>
+<h2>10. BottomNavigationView 이해</h2>
+<p>하단 메뉴는 Material Components의 <code>BottomNavigationView</code>입니다.</p>
+<p>관련 파일:</p>
+<ul>
+<li><code>app/src/main/java/com/example/day2day/presentation/main/MainActivity.java</code></li>
+<li><code>app/src/main/res/menu/menu_main_bottom_nav.xml</code></li>
+<li><code>app/src/main/res/layout/activity_main.xml</code></li>
+</ul>
+<p>핵심 코드:</p>
+<pre><code>BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+bottomNavigation.setOnItemSelectedListener(...);</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li>menu XML</li>
+<li><code>BottomNavigationView</code></li>
+<li><code>setOnItemSelectedListener</code></li>
+<li><code>item.getItemId</code></li>
+<li>Fragment 교체</li>
+</ul>
+<h2>11. 이벤트 처리 이해</h2>
+<p>버튼 클릭은 대부분 다음 형태입니다.</p>
+<pre><code>nextButton.setOnClickListener(
+    v -&gt; startActivity(new Intent(MapPageActivity.this, FilteringActivity.class)));</code></pre>
+<p>또는 다음처럼 익명 클래스를 사용합니다.</p>
+<pre><code>goCourseMapButton.setOnClickListener(
+    new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        ...
+      }
+    });</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li><code>View.OnClickListener</code></li>
+<li><code>onClick</code></li>
+<li>람다식</li>
+<li>버튼 클릭 이벤트</li>
+<li>화면 이동 이벤트</li>
+</ul>
+<p>추천 읽기 순서:</p>
+<ol>
+<li><code>StartActivity.java</code></li>
+<li><code>MapPageActivity.java</code></li>
+<li><code>FilteringActivity.java</code></li>
+<li><code>CourseDetailPageActivity.java</code></li>
+</ol>
+<h2>12. 리소스 시스템 이해</h2>
+<p>Android는 색상, 문자열, 배경, 아이콘을 코드에 직접 넣기보다 <code>res</code> 아래에 둡니다.</p>
+<p>주요 파일:</p>
+<ul>
+<li><code>res/values/colors.xml</code></li>
+<li><code>res/values/strings.xml</code></li>
+<li><code>res/values/themes.xml</code></li>
+<li><code>res/drawable/*.xml</code></li>
+<li><code>res/layout/*.xml</code></li>
+<li><code>res/menu/*.xml</code></li>
+</ul>
+<p>Java에서는 다음처럼 접근합니다.</p>
+<pre><code>R.color.rose
+R.layout.fragment_home
+R.id.cc_title
+R.drawable.shape_tag_rose</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li><code>R</code> 클래스</li>
+<li><code>@color/...</code></li>
+<li><code>@string/...</code></li>
+<li><code>@drawable/...</code></li>
+<li><code>@layout/...</code></li>
+<li><code>@id/...</code></li>
+<li><code>@style/...</code></li>
+</ul>
+<p><code>R</code>은 리소스 이름을 Java 코드에서 사용할 수 있게 해주는 자동 생성 클래스라고 이해하면 됩니다.</p>
+<h2>13. Drawable과 Shape 이해</h2>
+<p>이 프로젝트에는 XML drawable이 많이 있습니다.</p>
+<p>예시:</p>
+<ul>
+<li><code>shape_card.xml</code></li>
+<li><code>shape_tag_rose.xml</code></li>
+<li><code>bg_weather_banner.xml</code></li>
+<li><code>bg_splash_gradient.xml</code></li>
+<li><code>ic_splash_logo.xml</code></li>
+</ul>
+<p>공부할 개념:</p>
+<ul>
+<li>XML drawable</li>
+<li><code>shape</code></li>
+<li><code>solid</code></li>
+<li><code>stroke</code></li>
+<li><code>corners</code></li>
+<li><code>gradient</code></li>
+<li>vector drawable</li>
+</ul>
+<p>Java 코드에서 drawable을 동적으로 만드는 예시:</p>
+<pre><code>GradientDrawable thumbBg = new GradientDrawable();
+thumbBg.setShape(GradientDrawable.RECTANGLE);
+thumbBg.setCornerRadius(dpToPx(12));
+thumbBg.setColor(Color.parseColor(course[4]));
+thumb.setBackground(thumbBg);</code></pre>
+<p>관련 파일:</p>
+<ul>
+<li><code>HomeFragment.java</code></li>
+</ul>
+<h2>14. dp, px, sp 이해</h2>
+<p>Android UI에서 자주 쓰는 단위:</p>
+<table><thead><tr><th>단위</th><th>의미</th></tr></thead><tbody>
+<tr><td><code>dp</code></td><td>화면 밀도와 무관하게 비슷한 크기로 보이게 하는 단위</td></tr>
+<tr><td><code>sp</code></td><td>글자 크기용 단위</td></tr>
+<tr><td><code>px</code></td><td>실제 픽셀</td></tr>
+</tbody></table>
+<p><code>HomeFragment</code>에는 <code>dp</code>를 <code>px</code>로 변환하는 메서드가 있습니다.</p>
+<pre><code>private int dpToPx(int dp) {
+  return Math.round(dp * requireContext().getResources().getDisplayMetrics().density);
+}</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li><code>dp</code></li>
+<li><code>sp</code></li>
+<li><code>px</code></li>
+<li><code>density</code></li>
+<li><code>DisplayMetrics</code></li>
+</ul>
+<h2>15. Insets 이해</h2>
+<p>이 프로젝트에는 상태바와 네비게이션바에 UI가 가려지지 않도록 처리하는 코드가 있습니다.</p>
+<p>공통 헬퍼:</p>
+<ul>
+<li><code>app/src/main/java/com/example/day2day/presentation/common/NavigationBarInsetHelper.java</code></li>
+</ul>
+<p>예시:</p>
+<pre><code>NavigationBarInsetHelper.applyBottomInset(rootView, nextButton);</code></pre>
+<p>이 코드는 하단 버튼이 Android 네비게이션바나 제스처 영역에 가려지지 않게 아래 margin을 조정합니다.</p>
+<p>공부할 개념:</p>
+<ul>
+<li>status bar</li>
+<li>navigation bar</li>
+<li>gesture navigation</li>
+<li>WindowInsets</li>
+<li><code>ViewCompat.setOnApplyWindowInsetsListener</code></li>
+<li>padding과 margin의 차이</li>
+</ul>
+<p>이 주제는 Activity, Fragment, XML을 먼저 이해한 뒤 보는 것이 좋습니다.</p>
+<h2>16. Handler와 지연 실행</h2>
+<p><code>SplashActivity</code>에는 다음 코드가 있습니다.</p>
+<pre><code>private final Handler handler = new Handler(Looper.getMainLooper());</code></pre>
+<pre><code>handler.postDelayed(navigationRunnable, 2000);</code></pre>
+<p>뜻:</p>
+<ul>
+<li>메인 스레드에서</li>
+<li>2초 뒤에</li>
+<li><code>navigationRunnable</code>을 실행한다</li>
+</ul>
+<p>공부할 개념:</p>
+<ul>
+<li>Thread</li>
+<li>Main Thread, UI Thread</li>
+<li>Handler</li>
+<li>Looper</li>
+<li>Runnable</li>
+<li><code>postDelayed</code></li>
+<li><code>removeCallbacks</code></li>
+</ul>
+<p>관련 파일:</p>
+<ul>
+<li><code>SplashActivity.java</code></li>
+</ul>
+<h2>17. HomeFragment 집중 분석</h2>
+<p>이 프로젝트에서 가장 복잡한 파일은 <code>HomeFragment.java</code>입니다.</p>
+<p>이 파일을 다음 순서로 나눠서 보면 됩니다.</p>
+<h3>17.1 상수와 데이터</h3>
+<pre><code>private static final int SCROLL_THRESHOLD_DP = 100;
+private static final String[][] COURSES = { ... };
+private static final int PER_PAGE = 5;</code></pre>
+<h3>17.2 View 변수</h3>
+<pre><code>private View weatherBanner;
+private View weatherFull;
+private View weatherMini;
+private LinearLayout courseList;
+private View loadMore;</code></pre>
+<h3>17.3 XML inflate</h3>
+<pre><code>return inflater.inflate(R.layout.fragment_home, container, false);</code></pre>
+<h3>17.4 View 연결</h3>
+<pre><code>weatherBanner = view.findViewById(R.id.weather_banner);
+courseList = view.findViewById(R.id.course_list);</code></pre>
+<h3>17.5 클릭 이벤트</h3>
+<pre><code>view.findViewById(R.id.btn_nearby_course)
+    .setOnClickListener(
+        v -&gt; startActivity(new Intent(requireContext(), MapPageActivity.class)));</code></pre>
+<h3>17.6 스크롤 이벤트</h3>
+<pre><code>scrollBody.setOnScrollChangeListener(...);</code></pre>
+<h3>17.7 코스 카드 동적 추가</h3>
+<pre><code>View card = inflater.inflate(R.layout.item_course_card, courseList, false);
+bindCourseCard(card, COURSES[i]);
+courseList.addView(card);</code></pre>
+<h3>17.8 카드에 데이터 바인딩</h3>
+<pre><code>((TextView) card.findViewById(R.id.cc_title)).setText(course[0]);</code></pre>
+<p>핵심은 XML에 빈 리스트 영역을 만들고, Java 코드에서 카드 View를 반복적으로 추가한다는 점입니다.</p>
+<h2>18. 동적 UI 생성 이해</h2>
+<p><code>HomeFragment</code>의 <code>bindCourseCard</code>에서는 Java 코드로 View를 직접 만듭니다.</p>
+<pre><code>TextView tagView = new TextView(requireContext());
+tagView.setText(tag);
+tagView.setTextColor(requireContext().getColor(R.color.rose));
+tagView.setTextSize(9f);
+tagView.setBackgroundResource(R.drawable.shape_tag_rose);
+tagsLayout.addView(tagView);</code></pre>
+<p>공부할 개념:</p>
+<ul>
+<li><code>new TextView(...)</code></li>
+<li><code>setText</code></li>
+<li><code>setTextColor</code></li>
+<li><code>setTextSize</code></li>
+<li><code>setPadding</code></li>
+<li><code>LayoutParams</code></li>
+<li><code>addView</code></li>
+</ul>
+<p>나중에 코스가 많아지면 이런 구조는 보통 <code>RecyclerView</code>로 바꿉니다. 지금은 동적 View 생성의 기본 예제로 이해하면 됩니다.</p>
+<h2>19. 스크롤에 따른 UI 변화</h2>
+<p><code>HomeFragment</code>에는 스크롤하면 날씨 배너가 줄어드는 코드가 있습니다.</p>
+<pre><code>float fraction = Math.min(1f, Math.max(0f, scrollY / threshold));
+weatherFull.setAlpha(1f - fraction);
+weatherMini.setAlpha(fraction);</code></pre>
+<p>뜻:</p>
+<ul>
+<li>스크롤이 적을 때는 큰 날씨 배너가 보인다.</li>
+<li>스크롤이 많아질수록 작은 날씨 배너가 보인다.</li>
+<li><code>alpha</code>로 투명도를 조절한다.</li>
+<li>height도 같이 줄인다.</li>
+</ul>
+<p>공부할 개념:</p>
+<ul>
+<li><code>NestedScrollView</code></li>
+<li><code>scrollY</code></li>
+<li><code>alpha</code></li>
+<li>View height 변경</li>
+<li><code>requestLayout</code></li>
+<li>보간, interpolation</li>
+</ul>
+<p>초반에는 완벽히 이해하지 않아도 됩니다. Activity, Fragment, XML을 먼저 이해한 뒤 다시 보면 됩니다.</p>
+<h2>20. Naver Map SDK 이해</h2>
+<p>지도 관련 파일:</p>
+<ul>
+<li><code>CourseMapPageActivity.java</code></li>
+<li><code>activity_course_map_page.xml</code></li>
+<li><code>AndroidManifest.xml</code></li>
+<li><code>app/build.gradle.kts</code></li>
+</ul>
+<p>현재 코드는 지도 기능이 깊게 구현된 상태는 아닙니다.</p>
+<pre><code>public class CourseMapPageActivity extends AppCompatActivity implements OnMapReadyCallback</code></pre>
+<pre><code>@Override
+public void onMapReady(@NonNull NaverMap naverMap) {}</code></pre>
+<p>즉, 네이버 지도를 붙일 준비는 되어 있지만 <code>onMapReady</code> 안에는 아직 실제 로직이 없습니다.</p>
+<p>공부할 개념:</p>
+<ul>
+<li>외부 SDK</li>
+<li>Gradle 의존성 추가</li>
+<li>Manifest <code>meta-data</code></li>
+<li>API key</li>
+<li><code>OnMapReadyCallback</code></li>
+<li><code>NaverMap</code></li>
+<li>지도 Fragment 또는 MapView</li>
+</ul>
+<p>지도는 프로젝트 이해의 마지막 단계로 미뤄도 됩니다.</p>
+<h2>21. 프로젝트 화면 흐름</h2>
+<p>앱 전체 흐름:</p>
+<pre><code>앱 실행
+  |
+  v
+SplashActivity
+  - activity_splash.xml
+  - 2초 대기
+  |
+  v
+StartActivity
+  - activity_start.xml
+  - 시작 버튼 클릭
+  |
+  v
+MainActivity
+  - activity_main.xml
+  - BottomNavigationView
+  |
+  +-- HomeFragment
+  |     - fragment_home.xml
+  |     - 추천 코스 카드
+  |     - 근처 코스 버튼
+  |     - 장소 선택 버튼
+  |
+  +-- FavoritesFragment
+  |     - fragment_favorites.xml
+  |
+  +-- RecordFragment
+        - fragment_record.xml</code></pre>
+<p>추천 코스 흐름:</p>
+<pre><code>HomeFragment
+  |
+  +-- 근처 코스 버튼
+  |     v
+  |   MapPageActivity
+  |     v
+  |   FilteringActivity
+  |     v
+  |   CourseMapPageActivity
+  |
+  +-- 장소 선택 버튼
+  |     v
+  |   MapSelectionActivity
+  |     v
+  |   MapPageActivity
+  |     v
+  |   FilteringActivity
+  |     v
+  |   CourseMapPageActivity
+  |
+  +-- 코스 카드 클릭
+        v
+      CourseDetailPageActivity
+        v
+      CourseMapPageActivity</code></pre>
+<h2>22. 4주 학습 플랜</h2>
+<h3>1주차: Android 기본 구조 익히기</h3>
+<p>목표: 앱이 어떻게 시작되고 화면이 어떻게 연결되는지 이해합니다.</p>
+<table><thead><tr><th>날짜</th><th>학습 내용</th><th>볼 파일</th></tr></thead><tbody>
+<tr><td>1일차</td><td>Java 클래스, 상속, 오버라이딩, <code>onCreate</code>, <code>setContentView</code></td><td><code>SplashActivity.java</code>, <code>activity_splash.xml</code></td></tr>
+<tr><td>2일차</td><td><code>AndroidManifest.xml</code>, 시작 Activity, <code>MAIN</code>, <code>LAUNCHER</code>, 권한</td><td><code>AndroidManifest.xml</code></td></tr>
+<tr><td>3일차</td><td><code>Intent</code>, <code>startActivity</code>, <code>finish</code></td><td><code>SplashActivity.java</code>, <code>StartActivity.java</code></td></tr>
+<tr><td>4일차</td><td>XML 레이아웃 기초, <code>TextView</code>, <code>Button</code>, <code>ImageView</code></td><td><code>activity_start.xml</code>, <code>activity_splash.xml</code></td></tr>
+<tr><td>5일차</td><td><code>findViewById</code>, 버튼 클릭 이벤트, 람다식</td><td><code>StartActivity.java</code>, <code>MapPageActivity.java</code>, <code>FilteringActivity.java</code></td></tr>
+<tr><td>6일차</td><td>Gradle 기본, SDK 버전, dependencies</td><td><code>settings.gradle.kts</code>, <code>app/build.gradle.kts</code></td></tr>
+<tr><td>7일차</td><td>복습, Activity와 XML 연결 표 만들기</td><td>전체 흐름</td></tr>
+</tbody></table>
+<h3>2주차: MainActivity, Fragment, 하단 네비게이션 이해</h3>
+<p>목표: 메인 화면 구조와 탭 전환 방식을 이해합니다.</p>
+<table><thead><tr><th>날짜</th><th>학습 내용</th><th>볼 파일</th></tr></thead><tbody>
+<tr><td>1일차</td><td>Activity와 Fragment 차이</td><td><code>MainActivity.java</code>, <code>HomeFragment.java</code>, <code>FavoritesFragment.java</code>, <code>RecordFragment.java</code></td></tr>
+<tr><td>2일차</td><td><code>activity_main.xml</code>, Fragment container, BottomNavigationView</td><td><code>activity_main.xml</code>, <code>menu_main_bottom_nav.xml</code></td></tr>
+<tr><td>3일차</td><td><code>BottomNavigationView</code>, <code>setOnItemSelectedListener</code>, <code>item.getItemId</code></td><td><code>MainActivity.java</code></td></tr>
+<tr><td>4일차</td><td>Fragment 교체 코드</td><td><code>MainActivity.java</code></td></tr>
+<tr><td>5일차</td><td><code>onCreateView</code>, <code>inflater.inflate</code></td><td><code>HomeFragment.java</code>, <code>fragment_home.xml</code></td></tr>
+<tr><td>6일차</td><td><code>onViewCreated</code>, <code>view.findViewById</code></td><td><code>HomeFragment.java</code></td></tr>
+<tr><td>7일차</td><td>복습, 하단 탭 클릭 흐름 설명하기</td><td>메인 화면 전체</td></tr>
+</tbody></table>
+<h3>3주차: HomeFragment와 동적 UI 이해</h3>
+<p>목표: 프로젝트의 핵심 홈 화면을 이해합니다.</p>
+<table><thead><tr><th>날짜</th><th>학습 내용</th><th>볼 파일</th></tr></thead><tbody>
+<tr><td>1일차</td><td><code>COURSES</code> 2차원 배열, 코스 데이터 구조</td><td><code>HomeFragment.java</code></td></tr>
+<tr><td>2일차</td><td><code>loadMoreCourses</code>, <code>currentPage</code>, <code>PER_PAGE</code>, 반복문</td><td><code>HomeFragment.java</code></td></tr>
+<tr><td>3일차</td><td><code>item_course_card.xml</code>, 카드 inflate</td><td><code>item_course_card.xml</code>, <code>HomeFragment.java</code></td></tr>
+<tr><td>4일차</td><td><code>bindCourseCard</code>, 제목, 경로, 태그, 별점 바인딩</td><td><code>HomeFragment.java</code></td></tr>
+<tr><td>5일차</td><td>Java 코드로 <code>TextView</code> 생성, <code>addView</code>, <code>LayoutParams</code></td><td><code>HomeFragment.java</code></td></tr>
+<tr><td>6일차</td><td>날씨 배너 스크롤 애니메이션, <code>NestedScrollView</code>, <code>alpha</code></td><td><code>HomeFragment.java</code>, <code>fragment_home.xml</code></td></tr>
+<tr><td>7일차</td><td>복습, 코스 추가, 태그 색상 변경, 카드 클릭 흐름 확인</td><td>홈 화면 전체</td></tr>
+</tbody></table>
+<h3>4주차: 추천 플로우, Insets, 지도 이해</h3>
+<p>목표: 홈에서 추천 코스 화면으로 이어지는 흐름과 지도 관련 구조를 이해합니다.</p>
+<table><thead><tr><th>날짜</th><th>학습 내용</th><th>볼 파일</th></tr></thead><tbody>
+<tr><td>1일차</td><td>추천 플로우 Activity 전체 읽기</td><td><code>MapPageActivity.java</code>, <code>MapSelectionActivity.java</code>, <code>FilteringActivity.java</code>, <code>CourseMapPageActivity.java</code>, <code>CourseDetailPageActivity.java</code></td></tr>
+<tr><td>2일차</td><td>화면 이동 흐름 표 만들기</td><td>추천 플로우 전체</td></tr>
+<tr><td>3일차</td><td>Insets, 상태바, 네비게이션바 처리</td><td><code>NavigationBarInsetHelper.java</code>, <code>StartActivity.java</code>, <code>MapPageActivity.java</code>, <code>MapSelectionActivity.java</code></td></tr>
+<tr><td>4일차</td><td>테마, Splash 테마, Main 테마, NoActionBar</td><td><code>themes.xml</code>, <code>AndroidManifest.xml</code></td></tr>
+<tr><td>5일차</td><td>Naver Map SDK, Gradle 의존성, API key</td><td><code>app/build.gradle.kts</code>, <code>AndroidManifest.xml</code>, <code>CourseMapPageActivity.java</code></td></tr>
+<tr><td>6일차</td><td><code>OnMapReadyCallback</code>, <code>onMapReady</code></td><td><code>CourseMapPageActivity.java</code></td></tr>
+<tr><td>7일차</td><td>전체 앱 흐름 설명하기</td><td>전체 프로젝트</td></tr>
+</tbody></table>
+<h2>23. 직접 해볼 실습</h2>
+<h3>23.1 Splash 시간 바꾸기</h3>
+<p>파일:</p>
+<ul>
+<li><code>SplashActivity.java</code></li>
+</ul>
+<p>수정할 코드:</p>
+<pre><code>handler.postDelayed(navigationRunnable, 2000);</code></pre>
+<p><code>2000</code>을 <code>1000</code>이나 <code>3000</code>으로 바꿔봅니다.</p>
+<p>배우는 것:</p>
+<ul>
+<li>Handler</li>
+<li>지연 실행</li>
+<li>Activity 이동</li>
+</ul>
+<h3>23.2 StartActivity 버튼 텍스트 바꾸기</h3>
+<p>파일:</p>
+<ul>
+<li><code>activity_start.xml</code></li>
+<li><code>strings.xml</code></li>
+</ul>
+<p>배우는 것:</p>
+<ul>
+<li>XML 수정</li>
+<li>문자열 리소스</li>
+</ul>
+<h3>23.3 홈 코스 데이터 추가하기</h3>
+<p>파일:</p>
+<ul>
+<li><code>HomeFragment.java</code></li>
+</ul>
+<p><code>COURSES</code> 배열에 새 코스를 추가해봅니다.</p>
+<p>배우는 것:</p>
+<ul>
+<li>배열</li>
+<li>동적 카드 생성</li>
+<li><code>loadMoreCourses</code></li>
+</ul>
+<h3>23.4 카드 클릭 시 이동 화면 바꾸기</h3>
+<p>파일:</p>
+<ul>
+<li><code>HomeFragment.java</code></li>
+</ul>
+<p>현재 이동 대상:</p>
+<pre><code>CourseDetailPageActivity.class</code></pre>
+<p>이 값을 다른 Activity로 바꿔보며 화면 흐름을 확인합니다.</p>
+<p>배우는 것:</p>
+<ul>
+<li>Intent</li>
+<li>Activity 이동</li>
+</ul>
+<h3>23.5 BottomNavigation 메뉴 추가하기</h3>
+<p>수정할 파일:</p>
+<ul>
+<li><code>menu_main_bottom_nav.xml</code></li>
+<li><code>MainActivity.java</code></li>
+<li>새 Fragment Java 파일</li>
+<li>새 fragment XML 파일</li>
+</ul>
+<p>배우는 것:</p>
+<ul>
+<li>menu 리소스</li>
+<li>Fragment 추가</li>
+<li>하단 탭 구조</li>
+</ul>
+<h3>23.6 태그 색상 바꾸기</h3>
+<p>수정할 파일:</p>
+<ul>
+<li><code>colors.xml</code></li>
+<li><code>shape_tag_rose.xml</code></li>
+<li><code>HomeFragment.java</code></li>
+</ul>
+<p>배우는 것:</p>
+<ul>
+<li>color resource</li>
+<li>drawable resource</li>
+<li>Java에서 리소스 사용</li>
+</ul>
+<h3>23.7 NavigationBarInsetHelper 적용해보기</h3>
+<p>파일:</p>
+<ul>
+<li><code>NavigationBarInsetHelper.java</code></li>
+<li>원하는 Activity 파일</li>
+</ul>
+<p>배우는 것:</p>
+<ul>
+<li>공통 유틸 클래스</li>
+<li>상태바, 네비게이션바 대응</li>
+<li>코드 재사용</li>
+</ul>
+<h2>24. 핵심 개념 우선순위</h2>
+<p>가장 먼저 이해할 것:</p>
+<ol>
+<li><code>Activity</code></li>
+<li><code>onCreate</code></li>
+<li><code>setContentView</code></li>
+<li>XML layout</li>
+<li><code>findViewById</code></li>
+<li><code>Button.setOnClickListener</code></li>
+<li><code>Intent</code></li>
+<li><code>AndroidManifest.xml</code></li>
+</ol>
+<p>그 다음 이해할 것:</p>
+<ol>
+<li><code>Fragment</code></li>
+<li><code>BottomNavigationView</code></li>
+<li><code>FragmentManager</code></li>
+<li><code>res</code> 리소스 시스템</li>
+<li><code>drawable</code></li>
+<li><code>themes.xml</code></li>
+<li><code>WindowInsets</code></li>
+</ol>
+<p>마지막에 이해할 것:</p>
+<ol>
+<li><code>Handler</code></li>
+<li><code>NestedScrollView</code></li>
+<li>동적 View 생성</li>
+<li>Naver Map SDK</li>
+<li>Activity back stack</li>
+<li>Intent flags</li>
+</ol>
+<h2>25. 파일별 읽는 목적</h2>
+<table><thead><tr><th>파일</th><th>읽는 목적</th></tr></thead><tbody>
+<tr><td><code>SplashActivity.java</code></td><td>앱 시작, 2초 대기, 다음 화면 이동, Handler 이해</td></tr>
+<tr><td><code>StartActivity.java</code></td><td>버튼 클릭, MainActivity 이동, 하단 inset 처리 이해</td></tr>
+<tr><td><code>MainActivity.java</code></td><td>하단 네비게이션, Fragment 교체 구조 이해</td></tr>
+<tr><td><code>HomeFragment.java</code></td><td>홈 화면 핵심 로직, 코스 카드 목록, 스크롤 UI, 동적 View 생성 이해</td></tr>
+<tr><td><code>FavoritesFragment.java</code></td><td>가장 단순한 Fragment 예제</td></tr>
+<tr><td><code>RecordFragment.java</code></td><td>단순 Fragment 구조 반복 학습</td></tr>
+<tr><td><code>MapPageActivity.java</code></td><td>버튼 클릭 후 다음 추천 단계로 이동하는 단순 Activity</td></tr>
+<tr><td><code>FilteringActivity.java</code></td><td>추천 필터 화면에서 지도 화면으로 이동하는 흐름 이해</td></tr>
+<tr><td><code>MapSelectionActivity.java</code></td><td>상태바, 툴바, 하단 버튼 inset 처리가 들어간 Activity 이해</td></tr>
+<tr><td><code>CourseDetailPageActivity.java</code></td><td>코스 상세 화면, Intent flag, 화면 종료 흐름 이해</td></tr>
+<tr><td><code>CourseMapPageActivity.java</code></td><td>Naver Map SDK 연결 준비, 지도 화면 구조 이해</td></tr>
+<tr><td><code>NavigationBarInsetHelper.java</code></td><td>상태바, 네비게이션바 처리 공통화 이해</td></tr>
+<tr><td><code>AndroidManifest.xml</code></td><td>앱 권한, Activity 등록, 시작 화면, 지도 API key 확인</td></tr>
+<tr><td><code>app/build.gradle.kts</code></td><td>SDK 버전, 의존성, 빌드 설정 확인</td></tr>
+</tbody></table>
+<h2>26. 최종 이해도 체크리스트</h2>
+<p>아래 질문에 답할 수 있으면 이 프로젝트의 기본 구조를 이해한 것입니다.</p>
+<ul>
+<li>앱을 실행하면 왜 <code>SplashActivity</code>가 먼저 뜨는가?</li>
+<li><code>SplashActivity</code>에서 2초 후 <code>StartActivity</code>로 이동하는 코드는 어디인가?</li>
+<li><code>StartActivity</code>의 버튼은 어떤 XML id와 연결되어 있는가?</li>
+<li><code>MainActivity</code>는 왜 Fragment를 사용하고 있는가?</li>
+<li>하단 탭을 누르면 어떤 코드가 Fragment를 바꾸는가?</li>
+<li><code>HomeFragment</code>는 왜 <code>setContentView</code>가 아니라 <code>inflater.inflate</code>를 쓰는가?</li>
+<li>코스 카드는 XML에 전부 박혀 있는가, Java 코드에서 추가되는가?</li>
+<li><code>COURSES</code> 배열의 데이터가 화면에 어떻게 표시되는가?</li>
+<li>버튼 클릭 시 Activity 이동은 어떤 코드로 이루어지는가?</li>
+<li><code>AndroidManifest.xml</code>에서 앱 시작 화면은 어떻게 정해지는가?</li>
+<li>지도 SDK는 어디에 의존성으로 추가되어 있는가?</li>
+<li>네이버 지도 API key는 어디에 등록되어 있는가?</li>
+<li>상태바나 하단 네비게이션바에 UI가 가려지지 않게 하는 코드는 어디인가?</li>
+</ul>
+<h2>27. 추천 학습 방식</h2>
+<p>이 프로젝트는 다음 순서로 직접 열어보며 공부하는 것이 가장 좋습니다.</p>
+<ol>
+<li><code>AndroidManifest.xml</code>에서 시작 Activity를 확인합니다.</li>
+<li><code>SplashActivity.java</code>와 <code>activity_splash.xml</code>을 함께 봅니다.</li>
+<li><code>StartActivity.java</code>와 <code>activity_start.xml</code>을 함께 봅니다.</li>
+<li><code>MainActivity.java</code>, <code>activity_main.xml</code>, <code>menu_main_bottom_nav.xml</code>을 함께 봅니다.</li>
+<li><code>HomeFragment.java</code>, <code>fragment_home.xml</code>, <code>item_course_card.xml</code>을 함께 봅니다.</li>
+<li>추천 플로우 Activity들을 화면 이동 순서대로 봅니다.</li>
+<li>마지막으로 <code>NavigationBarInsetHelper.java</code>와 지도 관련 코드를 봅니다.</li>
+</ol>
+<p>코드를 읽을 때는 항상 다음 질문을 같이 던지면 좋습니다.</p>
+<ul>
+<li>이 Java 파일은 어떤 XML 파일을 화면으로 쓰는가?</li>
+<li>이 XML의 어떤 id를 Java 코드가 찾고 있는가?</li>
+<li>버튼을 누르면 어디로 이동하는가?</li>
+<li>이 화면은 Activity인가, Fragment인가?</li>
+<li>화면에 보이는 데이터는 XML에 고정되어 있는가, Java 코드에서 동적으로 들어오는가?</li>
+</ul>
+</body>
+</html>
