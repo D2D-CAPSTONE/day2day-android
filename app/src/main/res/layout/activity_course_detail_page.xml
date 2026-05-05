@@ -66,6 +66,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/btn_course_detail_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="#FCE8EC"
@@ -73,6 +74,7 @@
                 app:cardElevation="0dp">
 
                 <TextView
+                    android:id="@+id/tv_course_detail_favorite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="10dp"
@@ -127,6 +129,7 @@
                 android:paddingVertical="12dp">
 
                 <TextView
+                    android:id="@+id/tv_course_detail_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="홍대 감성 데이트 코스"
@@ -168,6 +171,7 @@
                         android:background="#E6E6E6" />
 
                     <TextView
+                        android:id="@+id/tv_course_detail_rating"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="★ 4.8"
@@ -181,12 +185,23 @@
                         android:background="#E6E6E6" />
 
                     <TextView
+                        android:id="@+id/tv_course_detail_place_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="장소 2곳"
                         android:textColor="#7A6580"
                         android:textSize="12sp" />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_course_detail_tags"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="#감성,#데이트"
+                    android:textColor="#E8506A"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <View
@@ -269,6 +284,7 @@
                             android:orientation="vertical">
 
                             <View
+                                android:id="@+id/view_course_detail_place1_thumb"
                                 android:layout_width="match_parent"
                                 android:layout_height="100dp"
                                 android:background="#F4E0E4" />
@@ -280,6 +296,7 @@
                                 android:padding="12dp">
 
                                 <TextView
+                                    android:id="@+id/tv_course_detail_place1_title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="연남동 맛집"
@@ -360,6 +377,7 @@
                     </LinearLayout>
 
                     <TextView
+                        android:id="@+id/tv_course_detail_move_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
@@ -416,6 +434,7 @@
                             android:orientation="vertical">
 
                             <View
+                                android:id="@+id/view_course_detail_place2_thumb"
                                 android:layout_width="match_parent"
                                 android:layout_height="100dp"
                                 android:background="#D0EAF8" />
@@ -427,6 +446,7 @@
                                 android:padding="12dp">
 
                                 <TextView
+                                    android:id="@+id/tv_course_detail_place2_title"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="홍대 카페"
