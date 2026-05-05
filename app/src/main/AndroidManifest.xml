@@ -10,9 +10,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher_composite"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_launcher_composite"
         android:supportsRtl="true"
         android:theme="@style/Theme.Day2day">
 
@@ -36,10 +36,6 @@
             android:name=".presentation.recommend.flow.MapSelectionActivity"
             android:exported="false"
             android:theme="@style/Theme.Day2day.NoActionBar" />
-
-        <activity
-            android:name=".presentation.start.StartActivity"
-            android:exported="false" />
 
         <activity
             android:name=".presentation.splash.SplashActivity"
