@@ -6,7 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.day2day.R;
-import com.example.day2day.presentation.start.StartActivity;
+import com.example.day2day.presentation.main.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
   private final Handler handler = new Handler(Looper.getMainLooper());
@@ -15,13 +15,12 @@ public class SplashActivity extends AppCompatActivity {
       new Runnable() {
         @Override
         public void run() {
-          Intent intent = new Intent(SplashActivity.this, StartActivity.class);
+          Intent intent = new Intent(SplashActivity.this, MainActivity.class);
           startActivity(intent);
           finish();
         }
       };
 
-  // 강제종료 돼도 데이터 유지
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -30,6 +29,7 @@ public class SplashActivity extends AppCompatActivity {
     handler.postDelayed(navigationRunnable, 2000);
   }
 
+  // 콜백 정리
   @Override
   protected void onDestroy() {
     super.onDestroy();
