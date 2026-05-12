@@ -53,6 +53,7 @@ public class MapSelectionActivity extends AppCompatActivity {
     TextView tvClose = findViewById(R.id.tv_close);
     TextView tvReset = findViewById(R.id.tv_reset);
 
+
     // 구를 탭했을 때
     mapView.setOnDistrictSelectedListener(
         district -> {
