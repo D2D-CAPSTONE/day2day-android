@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="#FFFAF5F0">
 
-    <!-- Header (HTML: sticky top bar) -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
@@ -72,7 +71,6 @@
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Main content -->
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="0dp"
@@ -108,6 +106,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="24dp" />
 
+            <!-- ★ 내부 클래스는 $ 기호로 참조 -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_map"
                 android:layout_width="match_parent"
@@ -117,20 +116,12 @@
                 app:cardCornerRadius="40dp"
                 app:cardElevation="2dp">
 
-                <FrameLayout
+                <view
+                    android:id="@+id/seoul_map"
+                    class="com.example.day2day.presentation.recommend.flow.MapSelectionActivity$SeoulMapView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:id="@+id/iv_map_sample"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="지도"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/seoul" />
-                </FrameLayout>
+                    android:padding="16dp" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -210,7 +201,7 @@
                     android:id="@+id/tv_selected_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="경기"
+                    android:text="-"
                     android:textColor="#FFE8506A"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -237,7 +228,8 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:backgroundTint="#FFE8506A"
-            android:text="경기 코스 추천받기"
+            android:enabled="false"
+            android:text="지역을 선택해주세요"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
