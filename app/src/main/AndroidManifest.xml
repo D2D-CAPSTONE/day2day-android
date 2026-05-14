@@ -13,24 +13,34 @@
         android:icon="@drawable/ic_launcher_composite"
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher_composite"
+        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.Day2day">
 
         <activity
             android:name=".presentation.recommend.flow.CourseDetailPageActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
 
         <activity
             android:name=".presentation.recommend.flow.CourseMapPageActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
 
         <activity
             android:name=".presentation.recommend.flow.FilteringActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
+
+        <activity
+            android:name=".presentation.recommend.flow.StartLocationPickerActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
 
         <activity
             android:name=".presentation.recommend.flow.MapPageActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
 
         <activity
             android:name=".presentation.recommend.flow.MapSelectionActivity"
