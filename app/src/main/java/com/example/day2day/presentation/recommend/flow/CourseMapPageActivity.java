@@ -1,5 +1,6 @@
 package com.example.day2day.presentation.recommend.flow;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,10 +18,12 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.day2day.R;
+import com.example.day2day.data.CourseContract;
 import com.example.day2day.data.local.CourseDatabase;
 import com.example.day2day.presentation.common.NavigationBarInsetHelper;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraAnimation;
+import com.naver.maps.map.CameraPosition;
 import com.naver.maps.map.CameraUpdate;
 import com.naver.maps.map.MapFragment;
 import com.naver.maps.map.NaverMap;
@@ -35,6 +38,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
   private static final double DEFAULT_LATITUDE = 37.5666102;
   private static final double DEFAULT_LONGITUDE = 126.9783881;
+  private static final double DEFAULT_ZOOM = 15.5;
   private static final int[] COURSE_COLORS = {
     Color.parseColor("#FCE8EC"),
     Color.parseColor("#E7F4FF"),
@@ -57,6 +61,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
   private double longitude = DEFAULT_LONGITUDE;
   private long generationSeed;
   private ArrayList<String> selectedKeywords = new ArrayList<>();
+  private String courseOrder = RecommendFlowContract.COURSE_ORDER_ACTIVITY_FOOD_CAFE;
   private String sortMode = RecommendFlowContract.SORT_RECOMMENDED;
 
   @Override
@@ -77,6 +82,11 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
       selectedKeywords = extraKeywords;
     }
 
+    String extraCourseOrder = getIntent().getStringExtra(RecommendFlowContract.EXTRA_COURSE_ORDER);
+    if (extraCourseOrder != null && !extraCourseOrder.isEmpty()) {
+      courseOrder = extraCourseOrder;
+    }
+
     String extraSortMode = getIntent().getStringExtra(RecommendFlowContract.EXTRA_SORT_MODE);
     if (extraSortMode != null && !extraSortMode.isEmpty()) {
       sortMode = extraSortMode;
@@ -94,7 +104,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     actionButton.setText("필터 다시 선택");
     actionButton.setOnClickListener(v -> finish());
 
-    adapter = new CourseAdapter(courses, this::changeMapToCourse);
+    adapter = new CourseAdapter(courses, this::changeMapToCourse, this::openCourseDetail);
     courseListView.setLayoutManager(
         new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     courseListView.setAdapter(adapter);
@@ -114,6 +124,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
   @Override
   public void onMapReady(@NonNull NaverMap naverMap) {
     this.naverMap = naverMap;
+    moveCameraToRequestedLocation();
     loadRecommendedCourses();
   }
 
@@ -130,7 +141,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
           try {
             loadedCourses =
                 NearbyCourseEngine.recommendCourses(
-                    latitude, longitude, selectedKeywords, sortMode, generationSeed);
+                    latitude, longitude, selectedKeywords, courseOrder, sortMode, generationSeed);
           } catch (Exception ignored) {
             loadedCourses = Collections.emptyList();
           }
@@ -155,6 +166,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
                 }
 
                 titleText.setText("추천 코스를 찾지 못했어요");
+                moveCameraToRequestedLocation();
                 Toast.makeText(
                         this,
                         "예시 코스는 더 이상 보여주지 않아요. 실제 주변 장소로 코스를 못 만들면 다시 선택해 주세요.",
@@ -165,7 +177,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
   }
 
   private void changeMapToCourse(CourseDto course) {
-    if (naverMap == null) {
+    if (naverMap == null || course == null || course.places == null) {
       return;
     }
 
@@ -204,6 +216,18 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     }
   }
 
+  private void moveCameraToRequestedLocation() {
+    if (naverMap == null) {
+      return;
+    }
+
+    LatLng requestedPosition = new LatLng(latitude, longitude);
+    CameraUpdate cameraUpdate =
+        CameraUpdate.toCameraPosition(new CameraPosition(requestedPosition, DEFAULT_ZOOM))
+            .animate(CameraAnimation.Easing);
+    naverMap.moveCamera(cameraUpdate);
+  }
+
   private void resetMapOverlays() {
     for (Marker marker : activeMarkers) {
       marker.setMap(null);
@@ -230,17 +254,32 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     actionButton.setAlpha(1f);
   }
 
+  private void openCourseDetail(CourseDto course) {
+    if (course == null) {
+      return;
+    }
+
+    Intent intent = new Intent(this, CourseDetailPageActivity.class);
+    intent.putExtra(CourseContract.EXTRA_RECOMMENDED_COURSE, course);
+    startActivity(intent);
+  }
+
   private static class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder> {
     private final List<CourseDto> items;
-    private final OnItemClickListener listener;
+    private final OnItemClickListener previewListener;
+    private final OnItemClickListener detailListener;
 
     interface OnItemClickListener {
       void onItemClick(CourseDto course);
     }
 
-    CourseAdapter(List<CourseDto> items, OnItemClickListener listener) {
+    CourseAdapter(
+        List<CourseDto> items,
+        OnItemClickListener previewListener,
+        OnItemClickListener detailListener) {
       this.items = items;
-      this.listener = listener;
+      this.previewListener = previewListener;
+      this.detailListener = detailListener;
     }
 
     @NonNull
@@ -263,11 +302,18 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
       bindRoute(holder.routeLayout, holder.itemView, course.places);
       bindTags(holder.tagsLayout, holder.itemView, course.tags);
+      holder.detailView.setVisibility(View.VISIBLE);
+      holder.detailView.setOnClickListener(
+          v -> {
+            if (detailListener != null) {
+              detailListener.onItemClick(course);
+            }
+          });
 
       holder.itemView.setOnClickListener(
           v -> {
-            if (listener != null) {
-              listener.onItemClick(course);
+            if (previewListener != null) {
+              previewListener.onItemClick(course);
             }
           });
     }
@@ -328,6 +374,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
       private final LinearLayout routeLayout;
       private final LinearLayout tagsLayout;
       private final TextView badgeView;
+      private final TextView detailView;
 
       ViewHolder(View itemView) {
         super(itemView);
@@ -336,6 +383,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
         routeLayout = itemView.findViewById(R.id.cc_route);
         tagsLayout = itemView.findViewById(R.id.cc_tags);
         badgeView = itemView.findViewById(R.id.cc_rating);
+        detailView = itemView.findViewById(R.id.cc_action);
       }
     }
   }

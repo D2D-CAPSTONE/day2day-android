@@ -45,11 +45,13 @@ public final class NearbyCourseEngine {
       double latitude,
       double longitude,
       List<String> selectedKeywords,
+      String courseOrder,
       String sortMode,
       long generationSeed)
       throws IOException, JSONException {
     SearchSession session = new SearchSession();
     List<String> safeKeywords = sanitizeKeywords(selectedKeywords);
+    CategoryType[] selectedOrder = resolveCourseOrder(courseOrder);
 
     List<PlaceCandidate> activityPool =
         loadCategoryPool(
@@ -99,10 +101,10 @@ public final class NearbyCourseEngine {
         activityPool,
         foodPool,
         cafePool,
+        selectedOrder,
         safeKeywords,
         generationSeed,
-        850,
-        650);
+        false);
 
     if (candidates.size() < TARGET_COURSE_COUNT) {
       buildCoursePass(
@@ -112,10 +114,10 @@ public final class NearbyCourseEngine {
           activityPool,
           foodPool,
           cafePool,
+          selectedOrder,
           safeKeywords,
           generationSeed + 97L,
-          1200,
-          900);
+          true);
     }
 
     if (candidates.isEmpty()) {
@@ -138,34 +140,55 @@ public final class NearbyCourseEngine {
       List<PlaceCandidate> activityPool,
       List<PlaceCandidate> foodPool,
       List<PlaceCandidate> cafePool,
+      CategoryType[] courseOrder,
       List<String> selectedKeywords,
       long seed,
-      int activityToFoodLimit,
-      int foodToCafeLimit) {
-    List<PlaceCandidate> rotatedActivities =
-        rotateWithinWindow(activityPool, seed, ROTATION_WINDOW);
+      boolean expandedDistance) {
+    List<PlaceCandidate> firstPool =
+        getPoolForType(courseOrder[0], activityPool, foodPool, cafePool);
+    List<PlaceCandidate> secondPool =
+        getPoolForType(courseOrder[1], activityPool, foodPool, cafePool);
+    List<PlaceCandidate> thirdPool =
+        getPoolForType(courseOrder[2], activityPool, foodPool, cafePool);
+    List<PlaceCandidate> rotatedFirstPlaces = rotateWithinWindow(firstPool, seed, ROTATION_WINDOW);
 
-    for (int i = 0; i < rotatedActivities.size() && courses.size() < MAX_GENERATED_COURSES; i++) {
-      PlaceCandidate activity = rotatedActivities.get(i);
+    int firstToSecondLimit =
+        resolveLegDistanceLimit(courseOrder[0], courseOrder[1], expandedDistance);
+    int secondToThirdLimit =
+        resolveLegDistanceLimit(courseOrder[1], courseOrder[2], expandedDistance);
+
+    for (int i = 0; i < rotatedFirstPlaces.size() && courses.size() < MAX_GENERATED_COURSES; i++) {
+      PlaceCandidate firstPlace = rotatedFirstPlaces.get(i);
       Set<String> usedMergeKeys = new HashSet<>();
-      usedMergeKeys.add(activity.mergeKey);
+      usedMergeKeys.add(firstPlace.mergeKey);
 
-      PlaceCandidate food =
+      PlaceCandidate secondPlace =
           selectNextPlace(
-              activity, foodPool, usedMergeKeys, stopUsage, seed + (31L * i), activityToFoodLimit);
-      if (food == null) {
+              firstPlace,
+              secondPool,
+              usedMergeKeys,
+              stopUsage,
+              seed + (31L * i),
+              firstToSecondLimit);
+      if (secondPlace == null) {
         continue;
       }
 
-      usedMergeKeys.add(food.mergeKey);
-      PlaceCandidate cafe =
+      usedMergeKeys.add(secondPlace.mergeKey);
+      PlaceCandidate thirdPlace =
           selectNextPlace(
-              food, cafePool, usedMergeKeys, stopUsage, seed + (53L * i), foodToCafeLimit);
-      if (cafe == null) {
+              secondPlace,
+              thirdPool,
+              usedMergeKeys,
+              stopUsage,
+              seed + (53L * i),
+              secondToThirdLimit);
+      if (thirdPlace == null) {
         continue;
       }
 
-      String courseKey = activity.mergeKey + "|" + food.mergeKey + "|" + cafe.mergeKey;
+      String courseKey =
+          firstPlace.mergeKey + "|" + secondPlace.mergeKey + "|" + thirdPlace.mergeKey;
       if (!usedCourseKeys.add(courseKey)) {
         continue;
       }
@@ -173,26 +196,37 @@ public final class NearbyCourseEngine {
       int legOneDistance =
           roundDistance(
               distanceBetween(
-                  activity.latitude, activity.longitude, food.latitude, food.longitude));
+                  firstPlace.latitude,
+                  firstPlace.longitude,
+                  secondPlace.latitude,
+                  secondPlace.longitude));
       int legTwoDistance =
           roundDistance(
-              distanceBetween(food.latitude, food.longitude, cafe.latitude, cafe.longitude));
-      int totalDistance = activity.userDistanceMeters + legOneDistance + legTwoDistance;
+              distanceBetween(
+                  secondPlace.latitude,
+                  secondPlace.longitude,
+                  thirdPlace.latitude,
+                  thirdPlace.longitude));
+      int totalDistance = firstPlace.userDistanceMeters + legOneDistance + legTwoDistance;
 
       courses.add(
           new CourseCandidate(
               new CourseDto(
-                  buildCourseName(activity),
-                  Arrays.asList(activity.toPlaceDto(), food.toPlaceDto(), cafe.toPlaceDto()),
-                  buildCourseTags(selectedKeywords, activity),
+                  buildCourseName(firstPlace),
+                  Arrays.asList(
+                      firstPlace.toPlaceDto(), secondPlace.toPlaceDto(), thirdPlace.toPlaceDto()),
+                  buildCourseTags(
+                      selectedKeywords,
+                      Arrays.asList(firstPlace, secondPlace, thirdPlace),
+                      courseOrder),
                   formatDistance(totalDistance)),
-              activity.userDistanceMeters,
+              firstPlace.userDistanceMeters,
               totalDistance,
-              usesNaver(activity, food, cafe)));
+              usesNaver(firstPlace, secondPlace, thirdPlace)));
 
-      incrementUsage(stopUsage, activity.uniqueKey);
-      incrementUsage(stopUsage, food.uniqueKey);
-      incrementUsage(stopUsage, cafe.uniqueKey);
+      incrementUsage(stopUsage, firstPlace.uniqueKey);
+      incrementUsage(stopUsage, secondPlace.uniqueKey);
+      incrementUsage(stopUsage, thirdPlace.uniqueKey);
     }
   }
 
@@ -596,8 +630,8 @@ public final class NearbyCourseEngine {
     return candidates;
   }
 
-  private static String buildCourseName(PlaceCandidate activity) {
-    String placeName = activity.placeName;
+  private static String buildCourseName(PlaceCandidate firstPlace) {
+    String placeName = firstPlace.placeName;
     if (placeName.length() > 12) {
       placeName = placeName.substring(0, 12).trim();
     }
@@ -631,6 +665,101 @@ public final class NearbyCourseEngine {
     return new ArrayList<>(tags);
   }
 
+  private static List<String> buildCourseTags(
+      List<String> selectedKeywords,
+      List<PlaceCandidate> orderedPlaces,
+      CategoryType[] courseOrder) {
+    LinkedHashSet<String> tags = new LinkedHashSet<>();
+
+    for (String keyword : selectedKeywords) {
+      String cleanKeyword = cleanText(keyword);
+      if (!cleanKeyword.isEmpty()) {
+        tags.add(cleanKeyword);
+      }
+      if (tags.size() >= 2) {
+        break;
+      }
+    }
+
+    for (PlaceCandidate place : orderedPlaces) {
+      if (tags.size() >= 3) {
+        break;
+      }
+      if (!place.categoryName.isEmpty()) {
+        tags.add(compactCategoryTag(place.categoryName));
+      }
+    }
+
+    for (CategoryType type : courseOrder) {
+      if (tags.size() >= 3) {
+        break;
+      }
+      tags.add(defaultTagForType(type));
+    }
+
+    return new ArrayList<>(tags);
+  }
+
+  private static String defaultTagForType(CategoryType type) {
+    if (type == CategoryType.FOOD) {
+      return "맛집";
+    }
+    if (type == CategoryType.CAFE) {
+      return "카페";
+    }
+    return "놀거리";
+  }
+
+  private static CategoryType[] resolveCourseOrder(String courseOrder) {
+    if (RecommendFlowContract.COURSE_ORDER_ACTIVITY_CAFE_FOOD.equals(courseOrder)) {
+      return new CategoryType[] {CategoryType.ACTIVITY, CategoryType.CAFE, CategoryType.FOOD};
+    }
+    if (RecommendFlowContract.COURSE_ORDER_FOOD_ACTIVITY_CAFE.equals(courseOrder)) {
+      return new CategoryType[] {CategoryType.FOOD, CategoryType.ACTIVITY, CategoryType.CAFE};
+    }
+    if (RecommendFlowContract.COURSE_ORDER_FOOD_CAFE_ACTIVITY.equals(courseOrder)) {
+      return new CategoryType[] {CategoryType.FOOD, CategoryType.CAFE, CategoryType.ACTIVITY};
+    }
+    if (RecommendFlowContract.COURSE_ORDER_CAFE_ACTIVITY_FOOD.equals(courseOrder)) {
+      return new CategoryType[] {CategoryType.CAFE, CategoryType.ACTIVITY, CategoryType.FOOD};
+    }
+    if (RecommendFlowContract.COURSE_ORDER_CAFE_FOOD_ACTIVITY.equals(courseOrder)) {
+      return new CategoryType[] {CategoryType.CAFE, CategoryType.FOOD, CategoryType.ACTIVITY};
+    }
+    return new CategoryType[] {CategoryType.ACTIVITY, CategoryType.FOOD, CategoryType.CAFE};
+  }
+
+  private static List<PlaceCandidate> getPoolForType(
+      CategoryType type,
+      List<PlaceCandidate> activityPool,
+      List<PlaceCandidate> foodPool,
+      List<PlaceCandidate> cafePool) {
+    if (type == CategoryType.FOOD) {
+      return foodPool;
+    }
+    if (type == CategoryType.CAFE) {
+      return cafePool;
+    }
+    return activityPool;
+  }
+
+  private static int resolveLegDistanceLimit(
+      CategoryType from, CategoryType to, boolean expandedDistance) {
+    if (areSamePair(from, to, CategoryType.ACTIVITY, CategoryType.FOOD)) {
+      return expandedDistance ? 1200 : 850;
+    }
+    if (areSamePair(from, to, CategoryType.FOOD, CategoryType.CAFE)) {
+      return expandedDistance ? 900 : 650;
+    }
+    return expandedDistance ? 1100 : 800;
+  }
+
+  private static boolean areSamePair(
+      CategoryType first, CategoryType second, CategoryType expectedA, CategoryType expectedB) {
+    return (first == expectedA && second == expectedB)
+        || (first == expectedB && second == expectedA);
+  }
+
   private static String compactCategoryTag(String categoryName) {
     String[] segments = categoryName.split(">");
     String value = segments[segments.length - 1].trim();
@@ -640,8 +769,7 @@ public final class NearbyCourseEngine {
     return value.length() > 8 ? value.substring(0, 8).trim() : value;
   }
 
-  private static boolean usesNaver(
-      PlaceCandidate activity, PlaceCandidate food, PlaceCandidate cafe) {
+  private static boolean usesNaver(PlaceCandidate... places) {
     return false;
   }
 

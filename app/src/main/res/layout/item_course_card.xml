@@ -76,6 +76,22 @@
                 android:textColor="@color/rose"
                 android:textSize="9sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/cc_action"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/shape_tag_blue"
+                android:paddingStart="7dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="7dp"
+                android:paddingBottom="2dp"
+                android:text="상세"
+                android:textColor="@color/blue_text"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
