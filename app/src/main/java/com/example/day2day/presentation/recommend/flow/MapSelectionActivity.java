@@ -1,6 +1,7 @@
 package com.example.day2day.presentation.recommend.flow;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -65,11 +66,10 @@ public class MapSelectionActivity extends AppCompatActivity {
     btnConfirm.setOnClickListener(
         v -> {
           if (selectedDistrict == null) return;
-          // TODO: 다음 화면으로 이동
-          // Intent intent = new Intent(this, CourseMapPageActivity.class);
-          // intent.putExtra("district_key", selectedDistrict.key);
-          // intent.putExtra("district_name", selectedDistrict.koreanName);
-          // startActivity(intent);
+          Intent intent = new Intent(this, FilteringActivity.class);
+          intent.putExtra("district_key", selectedDistrict.key);
+          intent.putExtra("district_name", selectedDistrict.koreanName);
+          startActivity(intent);
         });
 
     // 뒤로/닫기
