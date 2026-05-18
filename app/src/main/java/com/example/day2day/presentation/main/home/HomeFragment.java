@@ -46,10 +46,10 @@ public class HomeFragment extends Fragment {
 
     view.findViewById(R.id.btn_nearby_course)
         .setOnClickListener(
-            v -> startActivity(new Intent(requireContext(), MapSelectionActivity.class)));
+            v -> startActivity(new Intent(requireContext(), MapPageActivity.class)));
     view.findViewById(R.id.btn_location_course)
         .setOnClickListener(
-            v -> startActivity(new Intent(requireContext(), MapPageActivity.class)));
+            v -> startActivity(new Intent(requireContext(), MapSelectionActivity.class)));
 
     renderCourseCards(view);
   }
