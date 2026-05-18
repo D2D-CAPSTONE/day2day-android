@@ -5,16 +5,12 @@ plugins {
 
 android {
     namespace = "com.example.day2day"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.day2day"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -42,6 +38,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     implementation(libs.room.runtime)
     annotationProcessor(libs.room.compiler)
     testImplementation(libs.junit)

@@ -3,17 +3,21 @@ package com.example.day2day.presentation.recommend.flow;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.day2day.R;
+import com.example.day2day.data.remote.BackendPlaceResponse;
+import com.example.day2day.data.remote.NearbyCourseEngine;
 import com.example.day2day.presentation.common.NavigationBarInsetHelper;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraAnimation;
@@ -28,20 +32,40 @@ import java.util.List;
 
 public class CourseMapPageActivity extends AppCompatActivity implements OnMapReadyCallback {
 
+  private static final String TAG = "CourseMapPageActivity";
   private NaverMap naverMap;
   private final List<Marker> activeMarkers = new ArrayList<>();
   private PathOverlay currentPath;
+  private NearbyCourseEngine courseEngine;
+  private CourseAdapter adapter;
+  private final List<CourseDto> courseList = new ArrayList<>();
+  private CourseDto selectedCourse;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_course_map_page);
 
+    courseEngine = new NearbyCourseEngine();
+
     View rootView = findViewById(android.R.id.content);
     Button nextButton = findViewById(R.id.btn_course_map_page_next);
     NavigationBarInsetHelper.applyBottomInset(rootView, nextButton);
     nextButton.setOnClickListener(
-        v -> startActivity(new Intent(CourseMapPageActivity.this, CourseDetailPageActivity.class)));
+        v -> {
+          Intent intent = new Intent(CourseMapPageActivity.this, CourseDetailPageActivity.class);
+          if (selectedCourse != null) {
+            intent.putExtra("SELECTED_COURSE", selectedCourse);
+          }
+          startActivity(intent);
+        });
+
+    RecyclerView rvCourseList = findViewById(R.id.rv_course_list);
+    rvCourseList.setLayoutManager(
+        new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+    adapter = new CourseAdapter(courseList, this::changeMapToCourse);
+    rvCourseList.setAdapter(adapter);
 
     FragmentManager fm = getSupportFragmentManager();
     MapFragment mapFragment = (MapFragment) fm.findFragmentById(R.id.map);
@@ -50,23 +74,87 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
       fm.beginTransaction().add(R.id.map, mapFragment).commit();
     }
     mapFragment.getMapAsync(this);
+
+    String keyword = getIntent().getStringExtra("FILTER_KEYWORD");
+    if (keyword == null || keyword.isEmpty()) {
+      keyword = "연남동 데이트";
+    }
+    fetchCoursesFromServer(keyword);
+  }
+
+  private void fetchCoursesFromServer(String keyword) {
+    courseEngine.fetchNearbyPlaces(
+        keyword,
+        new NearbyCourseEngine.FetchPlacesCallback() {
+          @Override
+          public void onSuccess(List<BackendPlaceResponse> places) {
+            Log.d(TAG, "서버 통신 성공. 받은 장소 개수: " + places.size());
+            List<PlaceDto> validPlaces = new ArrayList<>();
+            for (BackendPlaceResponse place : places) {
+              if (place.getX() == null
+                  || place.getX().isEmpty()
+                  || place.getY() == null
+                  || place.getY().isEmpty()) {
+                Log.w(TAG, "좌표값이 없는 장소 데이터는 건너뜁니다: " + place.getName());
+                continue;
+              }
+
+              try {
+                double lat = Double.parseDouble(place.getY());
+                double lng = Double.parseDouble(place.getX());
+                validPlaces.add(new PlaceDto(place.getName(), lat, lng));
+              } catch (NumberFormatException e) {
+                Log.e(
+                    TAG,
+                    "좌표 파싱 실패: " + place.getName() + ", x=" + place.getX() + ", y=" + place.getY(),
+                    e);
+              }
+            }
+
+            if (!validPlaces.isEmpty()) {
+              runOnUiThread(
+                  () -> {
+                    Log.d(TAG, "UI 업데이트 시작. 유효한 장소 개수: " + validPlaces.size());
+                    courseList.clear();
+
+                    int courseCount = 0;
+                    for (int i = 0; i < validPlaces.size() && courseCount < 3; i += 3) {
+                      int end = Math.min(i + 3, validPlaces.size());
+                      List<PlaceDto> coursePlaces = new ArrayList<>(validPlaces.subList(i, end));
+                      String courseName = keyword + " 추천 코스 " + (courseCount + 1);
+                      courseList.add(new CourseDto(courseName, coursePlaces));
+                      courseCount++;
+                    }
+
+                    adapter.notifyDataSetChanged();
+                    if (naverMap != null && !courseList.isEmpty()) {
+                      changeMapToCourse(courseList.get(0));
+                    }
+                  });
+            } else {
+              runOnUiThread(
+                  () -> {
+                    Log.w(TAG, "유효한 장소가 없어 UI에 표시할 내용이 없습니다.");
+                    Toast.makeText(CourseMapPageActivity.this, "검색 결과가 없습니다.", Toast.LENGTH_SHORT)
+                        .show();
+                  });
+            }
+          }
+
+          @Override
+          public void onFailure(String errorMessage) {
+            Log.e(TAG, "서버 통신 실패: " + errorMessage);
+            runOnUiThread(
+                () ->
+                    Toast.makeText(CourseMapPageActivity.this, errorMessage, Toast.LENGTH_SHORT)
+                        .show());
+          }
+        });
   }
 
   @Override
   public void onMapReady(@NonNull NaverMap naverMap) {
     this.naverMap = naverMap;
-    List<CourseDto> courseList = fetchDummyCourses();
-
-    RecyclerView rvCourseList = findViewById(R.id.rv_course_list);
-    rvCourseList.setLayoutManager(
-        new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-    CourseAdapter adapter =
-        new CourseAdapter(
-            courseList,
-                this::changeMapToCourse);
-    rvCourseList.setAdapter(adapter);
-
     if (!courseList.isEmpty()) {
       changeMapToCourse(courseList.get(0));
     }
@@ -74,6 +162,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
   private void changeMapToCourse(CourseDto course) {
     if (naverMap == null) return;
+    this.selectedCourse = course;
 
     for (Marker marker : activeMarkers) {
       marker.setMap(null);
@@ -162,29 +251,5 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
         super(itemView);
       }
     }
-  }
-
-  private List<CourseDto> fetchDummyCourses() {
-    List<CourseDto> courses = new ArrayList<>();
-
-    List<PlaceDto> yeonnamPlaces = new ArrayList<>();
-    yeonnamPlaces.add(new PlaceDto("디어리스트 연남", 37.558384, 126.923055));
-    yeonnamPlaces.add(new PlaceDto("라헬의부엌", 37.561569, 126.924827));
-    yeonnamPlaces.add(new PlaceDto("인생네컷", 37.556209, 126.924003));
-    courses.add(new CourseDto("연남동 데이트 코스", yeonnamPlaces));
-
-    List<PlaceDto> hapjeongPlaces = new ArrayList<>();
-    hapjeongPlaces.add(new PlaceDto("합정 옥동식", 37.5539, 126.9157));
-    hapjeongPlaces.add(new PlaceDto("어반플랜트 합정", 37.5491176, 126.9150796));
-    hapjeongPlaces.add(new PlaceDto("향수공방 아로마인드", 37.5501815, 126.9113645));
-    courses.add(new CourseDto("합정 공방 데이트 코스", hapjeongPlaces));
-
-    List<PlaceDto> hongdaePlaces = new ArrayList<>();
-    hongdaePlaces.add(new PlaceDto("카카오프렌즈 홍대점", 37.5567, 126.9242));
-    hongdaePlaces.add(new PlaceDto("빌라 더 다이닝 홍대본점", 37.5574, 126.9247));
-    hongdaePlaces.add(new PlaceDto("피오니", 37.5500942974697, 126.919769002818));
-    courses.add(new CourseDto("홍대 메인 스트릿 코스", hongdaePlaces));
-
-    return courses;
   }
 }

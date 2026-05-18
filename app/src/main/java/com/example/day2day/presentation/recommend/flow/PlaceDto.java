@@ -1,6 +1,8 @@
 package com.example.day2day.presentation.recommend.flow;
 
-public class PlaceDto {
+import java.io.Serializable;
+
+public class PlaceDto implements Serializable {
   public String placeName;
   public double latitude;
   public double longitude;
