@@ -33,7 +33,13 @@ public class FavoritesFragment extends Fragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    loadFavorites(view);
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    // 코스상세에서 찜을 변경하고 돌아올 때도 최신 데이터를 반영하기 위해 onResume에서 로드한다
+    loadFavorites(requireView());
   }
 
   private void loadFavorites(View view) {
@@ -61,6 +67,8 @@ public class FavoritesFragment extends Fragment {
                   () -> {
                     // runOnUiThread 진입 직전에도 한 번 더 확인한다
                     if (!isAdded()) return;
+                    list.removeAllViews();
+                    empty.setVisibility(View.GONE);
                     if (courses.isEmpty()) {
                       empty.setVisibility(View.VISIBLE);
                       return;

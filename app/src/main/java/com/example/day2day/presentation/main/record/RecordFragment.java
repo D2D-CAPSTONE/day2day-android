@@ -35,7 +35,13 @@ public class RecordFragment extends Fragment {
   @Override
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    loadRecords(view);
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    // 기록이 추가된 후 돌아올 때도 최신 데이터를 반영하기 위해 onResume에서 로드한다
+    loadRecords(requireView());
   }
 
   private void loadRecords(View view) {
@@ -76,6 +82,8 @@ public class RecordFragment extends Fragment {
                   () -> {
                     // runOnUiThread 진입 직전에도 한 번 더 확인한다
                     if (!isAdded()) return;
+                    list.removeAllViews();
+                    empty.setVisibility(View.GONE);
                     if (courses.isEmpty()) {
                       empty.setVisibility(View.VISIBLE);
                       return;
