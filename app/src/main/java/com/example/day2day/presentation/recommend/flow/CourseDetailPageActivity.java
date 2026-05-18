@@ -1,6 +1,5 @@
 package com.example.day2day.presentation.recommend.flow;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -48,19 +47,11 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     loadCourse();
   }
 
+  // 뒤로가기 버튼, corseMapPage로만 가서 요청 들어온 곳으로 다시 돌아가게 해야됨
   private void bindViews() {
     View goCourseMapButton = findViewById(R.id.btn_course_detail_go_course_map);
 
-    goCourseMapButton.setOnClickListener(
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            Intent intent = new Intent(CourseDetailPageActivity.this, CourseMapPageActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-          }
-        });
+    goCourseMapButton.setOnClickListener(v -> finish());
 
     favoriteButton = findViewById(R.id.btn_course_detail_favorite);
     favoriteText = findViewById(R.id.tv_course_detail_favorite);
@@ -77,6 +68,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     favoriteButton.setOnClickListener(v -> toggleFavorite());
   }
 
+  // courseId로 코스 정보를 가져오기
   private void loadCourse() {
     if (courseId == null || courseId.isEmpty()) {
       showMissingCourse();
@@ -106,6 +98,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
         });
   }
 
+  // 가져온 코스 정보를 UI에 렌더링
   private void renderCourse(Course course) {
     titleText.setText(course.title);
     ratingText.setText(course.ratingText);
@@ -132,6 +125,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     }
   }
 
+  // 찜하기
   private void toggleFavorite() {
     if (currentCourse == null) {
       Toast.makeText(this, "코스 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();

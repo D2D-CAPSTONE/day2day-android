@@ -62,9 +62,9 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
         new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
     CourseAdapter adapter =
-        new CourseAdapter(
-            courseList,
-                this::changeMapToCourse);
+            new CourseAdapter(
+                    courseList,
+                    this::changeMapToCourse);
     rvCourseList.setAdapter(adapter);
 
     if (!courseList.isEmpty()) {
