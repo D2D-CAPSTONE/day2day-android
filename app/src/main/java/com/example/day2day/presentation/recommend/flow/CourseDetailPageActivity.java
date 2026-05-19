@@ -1,6 +1,8 @@
 package com.example.day2day.presentation.recommend.flow;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   private Course currentCourse;
   private boolean isFavorite;
 
+  private View shareButton;
   private View favoriteButton;
   private TextView favoriteText;
   private TextView titleText;
@@ -53,6 +56,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
 
     goCourseMapButton.setOnClickListener(v -> finish());
 
+    shareButton = findViewById(R.id.btn_course_detail_share);
     favoriteButton = findViewById(R.id.btn_course_detail_favorite);
     favoriteText = findViewById(R.id.tv_course_detail_favorite);
     titleText = findViewById(R.id.tv_course_detail_title);
@@ -65,6 +69,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     place1ThumbView = findViewById(R.id.view_course_detail_place1_thumb);
     place2ThumbView = findViewById(R.id.view_course_detail_place2_thumb);
 
+    shareButton.setOnClickListener(v -> shareCourse());
     favoriteButton.setOnClickListener(v -> toggleFavorite());
   }
 
@@ -94,6 +99,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
                 }
                 renderCourse(currentCourse);
                 updateFavoriteUi();
+                shareButton.setEnabled(true);
               });
         });
   }
@@ -123,6 +129,32 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     } else {
       moveInfoText.setText("코스 동선을 확인해보세요");
     }
+  }
+
+  private void shareCourse() {
+    if (currentCourse == null) {
+      Toast.makeText(this, "공유할 코스 정보를 찾지 못했어요.", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+    shareIntent.setType("text/plain");
+    shareIntent.putExtra(Intent.EXTRA_SUBJECT, currentCourse.title);
+    shareIntent.putExtra(Intent.EXTRA_TEXT, buildShareText(currentCourse));
+    startActivity(Intent.createChooser(shareIntent, "코스 공유"));
+  }
+
+  private String buildShareText(Course course) {
+    String[] routes = course.routeText != null ? course.routeText.split(" > ") : new String[0];
+    String routeLine = TextUtils.join(" → ", routes);
+    String tagLine = course.tagsText != null ? course.tagsText.replace(",", " ") : "";
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(course.title).append('\n');
+    if (!routeLine.isEmpty()) sb.append(routeLine).append('\n');
+    if (!tagLine.isEmpty()) sb.append(tagLine).append('\n');
+    sb.append(course.ratingText).append(" · 장소 ").append(routes.length).append("곳");
+    return sb.toString();
   }
 
   // 찜하기
@@ -169,5 +201,6 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     moveInfoText.setText("이전 화면에서 전달된 courseId를 확인해주세요.");
     favoriteText.setText("찜하기");
     favoriteButton.setEnabled(false);
+    shareButton.setEnabled(false);
   }
 }
