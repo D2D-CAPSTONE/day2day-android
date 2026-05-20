@@ -86,10 +86,11 @@
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/btn_course_detail_share"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                app:cardBackgroundColor="#FEE500"
+                app:cardBackgroundColor="#FCE8EC"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="0dp">
 
@@ -98,8 +99,8 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="6dp"
-                    android:text="카톡 공유"
-                    android:textColor="#3C1E1E"
+                    android:text="공유하기"
+                    android:textColor="#E8506A"
                     android:textSize="11sp"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>

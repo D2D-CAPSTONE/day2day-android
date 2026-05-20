@@ -1,8 +1,9 @@
 package com.example.day2day.presentation.recommend.flow;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CourseDto {
+public class CourseDto implements Serializable {
   public String courseName;
   public List<PlaceDto> places;
 
