@@ -16,7 +16,6 @@ import com.example.day2day.data.local.CourseDatabase;
 import com.example.day2day.data.local.entity.Course;
 import com.example.day2day.presentation.common.CourseCardHelper;
 import com.example.day2day.presentation.recommend.flow.CourseDetailPageActivity;
-import java.util.ArrayList;
 import java.util.List;
 
 public class FavoritesFragment extends Fragment {
@@ -50,14 +49,7 @@ public class FavoritesFragment extends Fragment {
     // DB 조회는 시간이 걸려 메인 스레드에서 하면 앱이 멈추므로 백그라운드 스레드에서 실행한다
     CourseDatabase.databaseExecutor.execute(
         () -> {
-          List<String> courseIds = db.favoriteDao().getFavoriteCourseIds();
-          List<Course> courses = new ArrayList<>();
-          for (String id : courseIds) {
-            Course course = db.courseDao().getCourseById(id);
-            if (course != null) {
-              courses.add(course);
-            }
-          }
+          List<Course> courses = db.favoriteDao().getFavoriteCourses();
 
           // 백그라운드 작업 중 사용자가 탭을 전환하면 Fragment가 분리될 수 있어 확인한다
           if (!isAdded()) return;

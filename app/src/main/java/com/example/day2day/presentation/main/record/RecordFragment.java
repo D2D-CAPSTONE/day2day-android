@@ -18,7 +18,6 @@ import com.example.day2day.data.local.entity.Course;
 import com.example.day2day.data.local.entity.Record;
 import com.example.day2day.presentation.common.CourseCardHelper;
 import com.example.day2day.presentation.recommend.flow.CourseDetailPageActivity;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RecordFragment extends Fragment {
@@ -65,14 +64,7 @@ public class RecordFragment extends Fragment {
                 .insertRecord(new Record("popular_007", now - 86400000L * 14, "남산 야경 진짜 예뻤음"));
           }
 
-          List<Record> records = db.recordDao().getAllRecords();
-          List<Course> courses = new ArrayList<>();
-          for (Record record : records) {
-            Course course = db.courseDao().getCourseById(record.courseId);
-            if (course != null) {
-              courses.add(course);
-            }
-          }
+          List<Course> courses = db.recordDao().getRecordedCourses();
 
           // 백그라운드 작업 중 사용자가 탭을 전환하면 Fragment가 분리될 수 있어 확인한다
           if (!isAdded()) return;

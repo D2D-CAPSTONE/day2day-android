@@ -82,10 +82,17 @@ public class HomeFragment extends Fragment {
     CourseDatabase.databaseExecutor.execute(
         () -> {
           if (database.courseDao().getCourseCount() == 0) {
+            // 실제 서비스 출시 때는 CourseSeedData.get...() 호출 부분을 ApiService.fetchPopularCourses() 같은 걸로 교체
             database.courseDao().insertCourses(CourseSeedData.getPopularCourses());
           }
+          if (database.coursePlaceDao().getPlaceCount() == 0) {
+            database.coursePlaceDao().insertPlaces(CourseSeedData.getCoursePlaces());
+          }
+          if (database.popularCourseDao().getPopularCourseCount() == 0) {
+            database.popularCourseDao().insertPopularCourses(CourseSeedData.getPopularCourseIds());
+          }
 
-          List<Course> loadedCourses = database.courseDao().getAllCourses();
+          List<Course> loadedCourses = database.popularCourseDao().getPopularCourses();
           if (!isAdded()) {
             return;
           }
