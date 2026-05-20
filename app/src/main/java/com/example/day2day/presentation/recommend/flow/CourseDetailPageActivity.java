@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.day2day.R;
 import com.example.day2day.data.CourseContract;
 import com.example.day2day.data.local.CourseDatabase;
-import com.example.day2day.data.local.CourseSeedData;
 import com.example.day2day.data.local.entity.Course;
 import com.example.day2day.data.local.entity.Favorite;
 
@@ -85,10 +84,6 @@ public class CourseDetailPageActivity extends AppCompatActivity {
 
     CourseDatabase.databaseExecutor.execute(
         () -> {
-          if (database.courseDao().getCourseCount() == 0) {
-            database.courseDao().insertCourses(CourseSeedData.getPopularCourses());
-          }
-
           Course course = database.courseDao().getCourseById(courseId);
           boolean favorite = database.favoriteDao().isFavorite(courseId) > 0;
 
