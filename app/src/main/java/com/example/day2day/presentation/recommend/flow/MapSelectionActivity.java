@@ -1,6 +1,7 @@
 package com.example.day2day.presentation.recommend.flow;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -17,7 +18,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import com.example.day2day.R;
+import com.example.day2day.presentation.common.NavigationBarInsetHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +34,16 @@ public class MapSelectionActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     setContentView(R.layout.activity_map_selection);
+
+    WindowInsetsControllerCompat controller =
+        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+    controller.setAppearanceLightStatusBars(true);
+
+    View root = findViewById(R.id.root);
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    NavigationBarInsetHelper.applyTopInset(root, toolbar);
 
     SeoulMapView mapView = findViewById(R.id.seoul_map);
     TextView tvSelected = findViewById(R.id.tv_selected_name);
@@ -52,11 +66,10 @@ public class MapSelectionActivity extends AppCompatActivity {
     btnConfirm.setOnClickListener(
         v -> {
           if (selectedDistrict == null) return;
-          // TODO: 다음 화면으로 이동
-          // Intent intent = new Intent(this, CourseMapPageActivity.class);
-          // intent.putExtra("district_key", selectedDistrict.key);
-          // intent.putExtra("district_name", selectedDistrict.koreanName);
-          // startActivity(intent);
+          Intent intent = new Intent(this, FilteringActivity.class);
+          intent.putExtra("district_key", selectedDistrict.key);
+          intent.putExtra("district_name", selectedDistrict.koreanName);
+          startActivity(intent);
         });
 
     // 뒤로/닫기
