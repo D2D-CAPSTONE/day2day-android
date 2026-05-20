@@ -155,14 +155,6 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
   @Override
   public void onMapReady(@NonNull NaverMap naverMap) {
     this.naverMap = naverMap;
-    List<CourseDto> courseList = fetchDummyCourses();
-
-    RecyclerView rvCourseList = findViewById(R.id.rv_course_list);
-    rvCourseList.setLayoutManager(
-        new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-    CourseAdapter adapter = new CourseAdapter(courseList, this::changeMapToCourse);
-    rvCourseList.setAdapter(adapter);
 
     if (!courseList.isEmpty()) {
       changeMapToCourse(courseList.get(0));
