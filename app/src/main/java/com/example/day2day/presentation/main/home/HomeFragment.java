@@ -6,10 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import com.example.day2day.R;
@@ -17,6 +15,7 @@ import com.example.day2day.data.CourseContract;
 import com.example.day2day.data.local.CourseDatabase;
 import com.example.day2day.data.local.CourseSeedData;
 import com.example.day2day.data.local.entity.Course;
+import com.example.day2day.presentation.common.CourseCardHelper;
 import com.example.day2day.presentation.recommend.flow.CourseDetailPageActivity;
 import com.example.day2day.presentation.recommend.flow.MapPageActivity;
 import com.example.day2day.presentation.recommend.flow.MapSelectionActivity;
@@ -46,10 +45,10 @@ public class HomeFragment extends Fragment {
 
     view.findViewById(R.id.btn_nearby_course)
         .setOnClickListener(
-            v -> startActivity(new Intent(requireContext(), MapSelectionActivity.class)));
+            v -> startActivity(new Intent(requireContext(), MapPageActivity.class)));
     view.findViewById(R.id.btn_location_course)
         .setOnClickListener(
-            v -> startActivity(new Intent(requireContext(), MapPageActivity.class)));
+            v -> startActivity(new Intent(requireContext(), MapSelectionActivity.class)));
 
     renderCourseCards(view);
   }
@@ -107,62 +106,19 @@ public class HomeFragment extends Fragment {
   }
 
   private void appendCourses() {
-    LayoutInflater inflater = LayoutInflater.from(requireContext());
-    float density = getResources().getDisplayMetrics().density;
     int end = Math.min(currentIndex + PAGE_SIZE, courses.size());
 
     for (int i = currentIndex; i < end; i++) {
       Course item = courses.get(i);
-      View card = inflater.inflate(R.layout.item_course_card, courseList, false);
-
-      card.findViewById(R.id.cc_thumb).setBackgroundColor(item.thumbColor);
-      ((TextView) card.findViewById(R.id.cc_title)).setText(item.title);
-      ((TextView) card.findViewById(R.id.cc_rating)).setText(item.ratingText);
-
-      LinearLayout routeLayout = card.findViewById(R.id.cc_route);
-      String[] routeItems = item.routeText.split(" > ");
-      for (int j = 0; j < routeItems.length; j++) {
-        TextView stop = new TextView(requireContext());
-        stop.setText(routeItems[j]);
-        stop.setTextSize(9);
-        stop.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_medium));
-        routeLayout.addView(stop);
-        if (j < routeItems.length - 1) {
-          TextView arrow = new TextView(requireContext());
-          arrow.setText(" › ");
-          arrow.setTextSize(9);
-          arrow.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_light));
-          routeLayout.addView(arrow);
-        }
-      }
-
-      LinearLayout tagsLayout = card.findViewById(R.id.cc_tags);
-      int px7 = (int) (7 * density);
-      int px2 = (int) (2 * density);
-      int px4 = (int) (4 * density);
-      for (String tag : item.tagsText.split(",")) {
-        TextView tagView = new TextView(requireContext());
-        tagView.setText(tag.trim());
-        tagView.setTextSize(9);
-        tagView.setTextColor(ContextCompat.getColor(requireContext(), R.color.rose));
-        tagView.setBackground(
-            ContextCompat.getDrawable(requireContext(), R.drawable.shape_tag_rose));
-        tagView.setPadding(px7, px2, px7, px2);
-        LinearLayout.LayoutParams params =
-            new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.setMarginEnd(px4);
-        tagsLayout.addView(tagView, params);
-      }
-
-      card.setOnClickListener(
+      CourseCardHelper.addCard(
+          requireContext(),
+          item,
+          courseList,
           v -> {
             Intent intent = new Intent(requireContext(), CourseDetailPageActivity.class);
             intent.putExtra(CourseContract.EXTRA_COURSE_ID, item.courseId);
             startActivity(intent);
           });
-
-      courseList.addView(card);
     }
 
     currentIndex = end;
