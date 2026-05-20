@@ -19,16 +19,16 @@ import com.example.day2day.presentation.common.CourseCardHelper;
 import com.example.day2day.presentation.recommend.flow.CourseDetailPageActivity;
 import com.example.day2day.presentation.recommend.flow.MapPageActivity;
 import com.example.day2day.presentation.recommend.flow.MapSelectionActivity;
-import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
 
   private static final int PAGE_SIZE = 10;
-  private int currentIndex = 0;
+  private int currentOffset = 0;
+  private boolean hasMore = false;
+  private boolean isLoading = true;
   private LinearLayout courseList;
   private View loadMoreView;
-  private final List<Course> courses = new ArrayList<>();
 
   @Nullable
   @Override
@@ -62,15 +62,11 @@ public class HomeFragment extends Fragment {
     scrollBody.setOnScrollChangeListener(
         (NestedScrollView.OnScrollChangeListener)
             (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-              if (!v.canScrollVertically(1) && currentIndex < courses.size()) {
+              if (!v.canScrollVertically(1) && hasMore && !isLoading) {
+                isLoading = true;
                 loadMoreView.setVisibility(View.VISIBLE);
                 v.post(() -> v.fullScroll(View.FOCUS_DOWN));
-                v.postDelayed(
-                    () -> {
-                      appendCourses();
-                      loadMoreView.setVisibility(View.GONE);
-                    },
-                    700);
+                loadNextPage();
               }
             });
 
@@ -92,31 +88,45 @@ public class HomeFragment extends Fragment {
             database.popularCourseDao().insertPopularCourses(CourseSeedData.getPopularCourseIds());
           }
 
-          List<Course> loadedCourses = database.popularCourseDao().getPopularCourses();
-          if (!isAdded()) {
-            return;
-          }
+          List<Course> loaded = database.popularCourseDao().getPopularCoursesPaged(PAGE_SIZE, 0);
+          if (!isAdded()) return;
 
           requireActivity()
               .runOnUiThread(
                   () -> {
-                    if (!isAdded()) {
-                      return;
-                    }
-                    courses.clear();
-                    courses.addAll(loadedCourses);
-                    currentIndex = 0;
+                    if (!isAdded()) return;
                     courseList.removeAllViews();
-                    appendCourses();
+                    currentOffset = loaded.size();
+                    hasMore = loaded.size() == PAGE_SIZE;
+                    isLoading = false;
+                    appendCards(loaded);
                   });
         });
   }
 
-  private void appendCourses() {
-    int end = Math.min(currentIndex + PAGE_SIZE, courses.size());
+  private void loadNextPage() {
+    CourseDatabase database = CourseDatabase.getInstance(requireContext());
+    CourseDatabase.databaseExecutor.execute(
+        () -> {
+          List<Course> loaded =
+              database.popularCourseDao().getPopularCoursesPaged(PAGE_SIZE, currentOffset);
+          if (!isAdded()) return;
 
-    for (int i = currentIndex; i < end; i++) {
-      Course item = courses.get(i);
+          requireActivity()
+              .runOnUiThread(
+                  () -> {
+                    if (!isAdded()) return;
+                    currentOffset += loaded.size();
+                    hasMore = loaded.size() == PAGE_SIZE;
+                    isLoading = false;
+                    loadMoreView.setVisibility(View.GONE);
+                    appendCards(loaded);
+                  });
+        });
+  }
+
+  private void appendCards(List<Course> items) {
+    for (Course item : items) {
       CourseCardHelper.addCard(
           requireContext(),
           item,
@@ -127,7 +137,5 @@ public class HomeFragment extends Fragment {
             startActivity(intent);
           });
     }
-
-    currentIndex = end;
   }
 }
