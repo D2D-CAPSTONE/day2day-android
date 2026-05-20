@@ -3,10 +3,34 @@ package com.example.day2day.presentation.recommend.flow;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.day2day.R;
+import com.example.day2day.data.CourseContract;
+import com.example.day2day.data.local.CourseDatabase;
+import com.example.day2day.data.local.CourseSeedData;
+import com.example.day2day.data.local.entity.Course;
+import com.example.day2day.data.local.entity.Favorite;
 
 public class CourseDetailPageActivity extends AppCompatActivity {
+  private CourseDatabase database;
+  private String courseId;
+  private Course currentCourse;
+  private boolean isFavorite;
+
+  private View favoriteButton;
+  private TextView favoriteText;
+  private TextView titleText;
+  private TextView ratingText;
+  private TextView placeCountText;
+  private TextView tagsText;
+  private TextView place1TitleText;
+  private TextView place2TitleText;
+  private TextView moveInfoText;
+  private View place1ThumbView;
+  private View place2ThumbView;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -17,6 +41,14 @@ public class CourseDetailPageActivity extends AppCompatActivity {
       getSupportActionBar().hide();
     }
 
+    database = CourseDatabase.getInstance(this);
+    courseId = getIntent().getStringExtra(CourseContract.EXTRA_COURSE_ID);
+
+    bindViews();
+    loadCourse();
+  }
+
+  private void bindViews() {
     View goCourseMapButton = findViewById(R.id.btn_course_detail_go_course_map);
 
     goCourseMapButton.setOnClickListener(
@@ -29,5 +61,119 @@ public class CourseDetailPageActivity extends AppCompatActivity {
             finish();
           }
         });
+
+    favoriteButton = findViewById(R.id.btn_course_detail_favorite);
+    favoriteText = findViewById(R.id.tv_course_detail_favorite);
+    titleText = findViewById(R.id.tv_course_detail_title);
+    ratingText = findViewById(R.id.tv_course_detail_rating);
+    placeCountText = findViewById(R.id.tv_course_detail_place_count);
+    tagsText = findViewById(R.id.tv_course_detail_tags);
+    place1TitleText = findViewById(R.id.tv_course_detail_place1_title);
+    place2TitleText = findViewById(R.id.tv_course_detail_place2_title);
+    moveInfoText = findViewById(R.id.tv_course_detail_move_info);
+    place1ThumbView = findViewById(R.id.view_course_detail_place1_thumb);
+    place2ThumbView = findViewById(R.id.view_course_detail_place2_thumb);
+
+    favoriteButton.setOnClickListener(v -> toggleFavorite());
+  }
+
+  private void loadCourse() {
+    if (courseId == null || courseId.isEmpty()) {
+      showMissingCourse();
+      return;
+    }
+
+    CourseDatabase.databaseExecutor.execute(
+        () -> {
+          if (database.courseDao().getCourseCount() == 0) {
+            database.courseDao().insertCourses(CourseSeedData.getPopularCourses());
+          }
+
+          Course course = database.courseDao().getCourseById(courseId);
+          boolean favorite = database.favoriteDao().isFavorite(courseId) > 0;
+
+          runOnUiThread(
+              () -> {
+                currentCourse = course;
+                isFavorite = favorite;
+                if (currentCourse == null) {
+                  showMissingCourse();
+                  return;
+                }
+                renderCourse(currentCourse);
+                updateFavoriteUi();
+              });
+        });
+  }
+
+  private void renderCourse(Course course) {
+    titleText.setText(course.title);
+    ratingText.setText(course.ratingText);
+    tagsText.setText(course.tagsText.replace(",", "  "));
+    place1ThumbView.setBackgroundColor(course.thumbColor);
+    place2ThumbView.setBackgroundColor(course.thumbColor);
+
+    String[] routes = course.routeText.split(" > ");
+    placeCountText.setText("장소 " + routes.length + "곳");
+
+    if (routes.length > 0) {
+      place1TitleText.setText(routes[0]);
+    }
+    if (routes.length > 1) {
+      place2TitleText.setText(routes[1]);
+    } else {
+      place2TitleText.setText("다음 장소");
+    }
+
+    if (routes.length > 1) {
+      moveInfoText.setText(routes[0] + "에서 " + routes[1] + "로 이동");
+    } else {
+      moveInfoText.setText("코스 동선을 확인해보세요");
+    }
+  }
+
+  private void toggleFavorite() {
+    if (currentCourse == null) {
+      Toast.makeText(this, "코스 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    CourseDatabase.databaseExecutor.execute(
+        () -> {
+          if (isFavorite) {
+            database.favoriteDao().deleteFavoriteByCourseId(currentCourse.courseId);
+          } else {
+            database
+                .favoriteDao()
+                .insertFavorite(new Favorite(currentCourse.courseId, System.currentTimeMillis()));
+          }
+
+          boolean nextFavoriteState = !isFavorite;
+          runOnUiThread(
+              () -> {
+                isFavorite = nextFavoriteState;
+                updateFavoriteUi();
+                Toast.makeText(
+                        this, isFavorite ? "찜 목록에 추가했습니다." : "찜 목록에서 삭제했습니다.", Toast.LENGTH_SHORT)
+                    .show();
+              });
+        });
+  }
+
+  private void updateFavoriteUi() {
+    favoriteText.setText(isFavorite ? "찜 취소" : "찜하기");
+    favoriteButton.setEnabled(true);
+  }
+
+  private void showMissingCourse() {
+    titleText.setText("코스 정보를 찾을 수 없습니다");
+    ratingText.setText("-");
+    placeCountText.setText("장소 0곳");
+    tagsText.setText("");
+    place1TitleText.setText("코스 정보 없음");
+    place2TitleText.setText("코스 정보 없음");
+    moveInfoText.setText("이전 화면에서 전달된 courseId를 확인해주세요.");
+    favoriteText.setText("찜하기");
+    favoriteButton.setEnabled(false);
   }
 }
