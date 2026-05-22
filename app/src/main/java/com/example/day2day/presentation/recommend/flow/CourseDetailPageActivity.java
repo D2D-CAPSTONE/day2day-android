@@ -101,7 +101,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
             routeBuilder.toString(),
             "",
             "",
-            android.graphics.Color.LTGRAY);
+            Color.parseColor("#FCE8EC"));
 
     courseId = course.courseId;
 
