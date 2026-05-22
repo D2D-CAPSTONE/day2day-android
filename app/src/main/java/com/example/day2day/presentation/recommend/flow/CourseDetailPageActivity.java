@@ -1,17 +1,27 @@
 package com.example.day2day.presentation.recommend.flow;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.example.day2day.R;
 import com.example.day2day.data.CourseContract;
 import com.example.day2day.data.local.CourseDatabase;
 import com.example.day2day.data.local.entity.Course;
 import com.example.day2day.data.local.entity.Favorite;
+import java.util.Arrays;
+import java.util.List;
 
 public class CourseDetailPageActivity extends AppCompatActivity {
   private CourseDatabase database;
@@ -26,11 +36,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   private TextView ratingText;
   private TextView placeCountText;
   private TextView tagsText;
-  private TextView place1TitleText;
-  private TextView place2TitleText;
-  private TextView moveInfoText;
-  private View place1ThumbView;
-  private View place2ThumbView;
+  private RecyclerView rvPlaces;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +49,16 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     }
 
     database = CourseDatabase.getInstance(this);
-    courseId = getIntent().getStringExtra(CourseContract.EXTRA_COURSE_ID);
 
     bindViews();
-    loadCourse();
+
+    CourseDto dto = (CourseDto) getIntent().getSerializableExtra("SELECTED_COURSE");
+    if (dto != null) {
+      loadCourseFromDto(dto);
+    } else {
+      courseId = getIntent().getStringExtra(CourseContract.EXTRA_COURSE_ID);
+      loadCourse();
+    }
   }
 
   // 뒤로가기 버튼, corseMapPage로만 가서 요청 들어온 곳으로 다시 돌아가게 해야됨
@@ -62,14 +74,45 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     ratingText = findViewById(R.id.tv_course_detail_rating);
     placeCountText = findViewById(R.id.tv_course_detail_place_count);
     tagsText = findViewById(R.id.tv_course_detail_tags);
-    place1TitleText = findViewById(R.id.tv_course_detail_place1_title);
-    place2TitleText = findViewById(R.id.tv_course_detail_place2_title);
-    moveInfoText = findViewById(R.id.tv_course_detail_move_info);
-    place1ThumbView = findViewById(R.id.view_course_detail_place1_thumb);
-    place2ThumbView = findViewById(R.id.view_course_detail_place2_thumb);
+    rvPlaces = findViewById(R.id.rv_course_detail_places);
+    rvPlaces.setLayoutManager(new LinearLayoutManager(this));
+    rvPlaces.setNestedScrollingEnabled(false);
 
     shareButton.setOnClickListener(v -> shareCourse());
     favoriteButton.setOnClickListener(v -> toggleFavorite());
+  }
+
+  private void loadCourseFromDto(CourseDto dto) {
+    StringBuilder routeBuilder = new StringBuilder();
+    for (int i = 0; i < dto.places.size(); i++) {
+      if (i > 0) routeBuilder.append(" > ");
+      routeBuilder.append(dto.places.get(i).placeName);
+    }
+
+    Course course =
+        new Course(
+            dto.courseName,
+            dto.courseName,
+            routeBuilder.toString(),
+            "",
+            "",
+            android.graphics.Color.LTGRAY);
+
+    courseId = course.courseId;
+
+    CourseDatabase.databaseExecutor.execute(
+        () -> {
+          database.courseDao().insertCourse(course);
+          boolean favorite = database.favoriteDao().isFavorite(courseId) > 0;
+          runOnUiThread(
+              () -> {
+                currentCourse = course;
+                isFavorite = favorite;
+                renderCourse(course);
+                updateFavoriteUi();
+                shareButton.setEnabled(true);
+              });
+        });
   }
 
   // courseId로 코스 정보를 가져오기
@@ -104,26 +147,10 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     titleText.setText(course.title);
     ratingText.setText(course.ratingText);
     tagsText.setText(course.tagsText.replace(",", "  "));
-    place1ThumbView.setBackgroundColor(course.thumbColor);
-    place2ThumbView.setBackgroundColor(course.thumbColor);
 
     String[] routes = course.routeText.split(" > ");
     placeCountText.setText("장소 " + routes.length + "곳");
-
-    if (routes.length > 0) {
-      place1TitleText.setText(routes[0]);
-    }
-    if (routes.length > 1) {
-      place2TitleText.setText(routes[1]);
-    } else {
-      place2TitleText.setText("다음 장소");
-    }
-
-    if (routes.length > 1) {
-      moveInfoText.setText(routes[0] + "에서 " + routes[1] + "로 이동");
-    } else {
-      moveInfoText.setText("코스 동선을 확인해보세요");
-    }
+    rvPlaces.setAdapter(new PlaceAdapter(Arrays.asList(routes), course.thumbColor));
   }
 
   private void shareCourse() {
@@ -191,11 +218,80 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     ratingText.setText("-");
     placeCountText.setText("장소 0곳");
     tagsText.setText("");
-    place1TitleText.setText("코스 정보 없음");
-    place2TitleText.setText("코스 정보 없음");
-    moveInfoText.setText("이전 화면에서 전달된 courseId를 확인해주세요.");
     favoriteText.setText("찜하기");
     favoriteButton.setEnabled(false);
     shareButton.setEnabled(false);
+  }
+
+  // 들어오는 코스 리스트 개수에 맞춰 UI 구현
+  private static class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> {
+
+    private static final int[] BADGE_COLORS = {
+      Color.parseColor("#E8506A"),
+      Color.parseColor("#6BBDE8"),
+      Color.parseColor("#6BC87A"),
+      Color.parseColor("#E8A350"),
+      Color.parseColor("#9B6BE8"),
+    };
+
+    private final List<String> places;
+    private final int thumbColor;
+
+    PlaceAdapter(List<String> places, int thumbColor) {
+      this.places = places;
+      this.thumbColor = thumbColor;
+    }
+
+    // 장소 카드 UI가 필요할 때마다 item_place_card.xml로 뷰를 찍어냄
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+      View view =
+          LayoutInflater.from(parent.getContext()).inflate(R.layout.item_place_card, parent, false);
+      return new ViewHolder(view);
+    }
+
+    // 마지막 장소인지 판별 -> UI 처리 (선, 이동 정보 등)
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+      boolean isLast = position == places.size() - 1;
+
+      holder.tvPlaceNumber.setText(String.valueOf(position + 1));
+      holder.cvPlaceNumber.setCardBackgroundColor(BADGE_COLORS[position % BADGE_COLORS.length]);
+      holder.tvPlaceTitle.setText(places.get(position));
+      holder.viewThumb.setBackgroundColor(thumbColor);
+      holder.viewLine.setVisibility(isLast ? View.INVISIBLE : View.VISIBLE);
+      holder.layoutMoveInfo.setVisibility(isLast ? View.GONE : View.VISIBLE);
+
+      if (!isLast) {
+        holder.tvMoveInfo.setText(places.get(position) + "에서 " + places.get(position + 1) + "로 이동");
+      }
+    }
+
+    @Override
+    public int getItemCount() {
+      return places.size();
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+      final CardView cvPlaceNumber;
+      final TextView tvPlaceNumber;
+      final View viewThumb;
+      final View viewLine;
+      final TextView tvPlaceTitle;
+      final LinearLayout layoutMoveInfo;
+      final TextView tvMoveInfo;
+
+      ViewHolder(View itemView) {
+        super(itemView);
+        cvPlaceNumber = itemView.findViewById(R.id.cv_place_number);
+        tvPlaceNumber = itemView.findViewById(R.id.tv_place_number);
+        viewThumb = itemView.findViewById(R.id.view_place_thumb);
+        viewLine = itemView.findViewById(R.id.view_place_line);
+        tvPlaceTitle = itemView.findViewById(R.id.tv_place_title);
+        layoutMoveInfo = itemView.findViewById(R.id.layout_place_move_info);
+        tvMoveInfo = itemView.findViewById(R.id.tv_place_move_info);
+      }
+    }
   }
 }
