@@ -1,7 +1,9 @@
 package com.example.day2day.presentation.recommend.flow;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -20,7 +22,7 @@ import com.example.day2day.data.CourseContract;
 import com.example.day2day.data.local.CourseDatabase;
 import com.example.day2day.data.local.entity.Course;
 import com.example.day2day.data.local.entity.Favorite;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CourseDetailPageActivity extends AppCompatActivity {
@@ -84,9 +86,12 @@ public class CourseDetailPageActivity extends AppCompatActivity {
 
   private void loadCourseFromDto(CourseDto dto) {
     StringBuilder routeBuilder = new StringBuilder();
+    List<PlaceItem> placeItems = new ArrayList<>();
     for (int i = 0; i < dto.places.size(); i++) {
       if (i > 0) routeBuilder.append(" > ");
-      routeBuilder.append(dto.places.get(i).placeName);
+      PlaceDto p = dto.places.get(i);
+      routeBuilder.append(p.placeName);
+      placeItems.add(new PlaceItem(p.placeName, p.latitude, p.longitude));
     }
 
     Course course =
@@ -108,7 +113,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
               () -> {
                 currentCourse = course;
                 isFavorite = favorite;
-                renderCourse(course);
+                renderCourse(course, placeItems);
                 updateFavoriteUi();
                 shareButton.setEnabled(true);
               });
@@ -135,7 +140,10 @@ public class CourseDetailPageActivity extends AppCompatActivity {
                   showMissingCourse();
                   return;
                 }
-                renderCourse(currentCourse);
+                String[] routes = currentCourse.routeText.split(" > ");
+                List<PlaceItem> placeItems = new ArrayList<>();
+                for (String name : routes) placeItems.add(new PlaceItem(name));
+                renderCourse(currentCourse, placeItems);
                 updateFavoriteUi();
                 shareButton.setEnabled(true);
               });
@@ -143,14 +151,12 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   }
 
   // 가져온 코스 정보를 UI에 렌더링
-  private void renderCourse(Course course) {
+  private void renderCourse(Course course, List<PlaceItem> placeItems) {
     titleText.setText(course.title);
     ratingText.setText(course.ratingText);
     tagsText.setText(course.tagsText.replace(",", "  "));
-
-    String[] routes = course.routeText.split(" > ");
-    placeCountText.setText("장소 " + routes.length + "곳");
-    rvPlaces.setAdapter(new PlaceAdapter(Arrays.asList(routes), course.thumbColor));
+    placeCountText.setText("장소 " + placeItems.size() + "곳");
+    rvPlaces.setAdapter(new PlaceAdapter(placeItems, course.thumbColor));
   }
 
   private void shareCourse() {
@@ -223,6 +229,28 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     shareButton.setEnabled(false);
   }
 
+  private static class PlaceItem {
+    final String name;
+    final double lat;
+    final double lng;
+
+    PlaceItem(String name) {
+      this.name = name;
+      this.lat = 0;
+      this.lng = 0;
+    }
+
+    PlaceItem(String name, double lat, double lng) {
+      this.name = name;
+      this.lat = lat;
+      this.lng = lng;
+    }
+
+    boolean hasCoords() {
+      return lat != 0 || lng != 0;
+    }
+  }
+
   // 들어오는 코스 리스트 개수에 맞춰 UI 구현
   private static class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> {
 
@@ -234,10 +262,10 @@ public class CourseDetailPageActivity extends AppCompatActivity {
       Color.parseColor("#9B6BE8"),
     };
 
-    private final List<String> places;
+    private final List<PlaceItem> places;
     private final int thumbColor;
 
-    PlaceAdapter(List<String> places, int thumbColor) {
+    PlaceAdapter(List<PlaceItem> places, int thumbColor) {
       this.places = places;
       this.thumbColor = thumbColor;
     }
@@ -255,17 +283,40 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
       boolean isLast = position == places.size() - 1;
+      PlaceItem item = places.get(position);
 
       holder.tvPlaceNumber.setText(String.valueOf(position + 1));
       holder.cvPlaceNumber.setCardBackgroundColor(BADGE_COLORS[position % BADGE_COLORS.length]);
-      holder.tvPlaceTitle.setText(places.get(position));
+      holder.tvPlaceTitle.setText(item.name);
       holder.viewThumb.setBackgroundColor(thumbColor);
       holder.viewLine.setVisibility(isLast ? View.INVISIBLE : View.VISIBLE);
       holder.layoutMoveInfo.setVisibility(isLast ? View.GONE : View.VISIBLE);
 
       if (!isLast) {
-        holder.tvMoveInfo.setText(places.get(position) + "에서 " + places.get(position + 1) + "로 이동");
+        holder.tvMoveInfo.setText(item.name + "에서 " + places.get(position + 1).name + "로 이동");
       }
+
+      holder.btnNaverMap.setOnClickListener(
+          v -> {
+            if (item.hasCoords()) {
+              String appUrl =
+                  "naver://map?lat="
+                      + item.lat
+                      + "&lng="
+                      + item.lng
+                      + "&zoom=15&title="
+                      + Uri.encode(item.name);
+              String webUrl = "https://map.naver.com/p/?lat=" + item.lat + "&lng=" + item.lng;
+              try {
+                v.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(appUrl)));
+              } catch (ActivityNotFoundException e) {
+                v.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(webUrl)));
+              }
+            } else {
+              String searchUrl = "https://map.naver.com/p/search/" + Uri.encode(item.name);
+              v.getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(searchUrl)));
+            }
+          });
     }
 
     @Override
@@ -281,6 +332,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
       final TextView tvPlaceTitle;
       final LinearLayout layoutMoveInfo;
       final TextView tvMoveInfo;
+      final CardView btnNaverMap;
 
       ViewHolder(View itemView) {
         super(itemView);
@@ -291,6 +343,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
         tvPlaceTitle = itemView.findViewById(R.id.tv_place_title);
         layoutMoveInfo = itemView.findViewById(R.id.layout_place_move_info);
         tvMoveInfo = itemView.findViewById(R.id.tv_place_move_info);
+        btnNaverMap = itemView.findViewById(R.id.btn_naver_map);
       }
     }
   }

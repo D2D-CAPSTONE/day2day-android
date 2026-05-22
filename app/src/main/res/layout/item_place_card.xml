@@ -82,6 +82,7 @@
                         android:textStyle="bold" />
 
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/btn_naver_map"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="12dp"
