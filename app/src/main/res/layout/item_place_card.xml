@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="20dp"
             android:layout_weight="1"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="14dp"
@@ -108,6 +108,7 @@
         android:id="@+id/layout_place_move_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
         android:orientation="horizontal">
 
         <LinearLayout
