@@ -2,6 +2,7 @@ package com.example.day2day.presentation.recommend.flow;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   private Course currentCourse;
   private boolean isFavorite;
 
+  private View shareButton;
   private View favoriteButton;
   private TextView favoriteText;
   private TextView titleText;
@@ -47,20 +49,13 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     loadCourse();
   }
 
+  // 뒤로가기 버튼, corseMapPage로만 가서 요청 들어온 곳으로 다시 돌아가게 해야됨
   private void bindViews() {
     View goCourseMapButton = findViewById(R.id.btn_course_detail_go_course_map);
 
-    goCourseMapButton.setOnClickListener(
-        new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            Intent intent = new Intent(CourseDetailPageActivity.this, CourseMapPageActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
-          }
-        });
+    goCourseMapButton.setOnClickListener(v -> finish());
 
+    shareButton = findViewById(R.id.btn_course_detail_share);
     favoriteButton = findViewById(R.id.btn_course_detail_favorite);
     favoriteText = findViewById(R.id.tv_course_detail_favorite);
     titleText = findViewById(R.id.tv_course_detail_title);
@@ -73,9 +68,11 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     place1ThumbView = findViewById(R.id.view_course_detail_place1_thumb);
     place2ThumbView = findViewById(R.id.view_course_detail_place2_thumb);
 
+    shareButton.setOnClickListener(v -> shareCourse());
     favoriteButton.setOnClickListener(v -> toggleFavorite());
   }
 
+  // courseId로 코스 정보를 가져오기
   private void loadCourse() {
     if (courseId == null || courseId.isEmpty()) {
       showMissingCourse();
@@ -97,10 +94,12 @@ public class CourseDetailPageActivity extends AppCompatActivity {
                 }
                 renderCourse(currentCourse);
                 updateFavoriteUi();
+                shareButton.setEnabled(true);
               });
         });
   }
 
+  // 가져온 코스 정보를 UI에 렌더링
   private void renderCourse(Course course) {
     titleText.setText(course.title);
     ratingText.setText(course.ratingText);
@@ -127,6 +126,33 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     }
   }
 
+  private void shareCourse() {
+    if (currentCourse == null) {
+      Toast.makeText(this, "공유할 코스 정보를 찾지 못했어요.", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    Intent shareIntent = new Intent(Intent.ACTION_SEND);
+    shareIntent.setType("text/plain");
+    shareIntent.putExtra(Intent.EXTRA_SUBJECT, currentCourse.title);
+    shareIntent.putExtra(Intent.EXTRA_TEXT, buildShareText(currentCourse));
+    startActivity(Intent.createChooser(shareIntent, "코스 공유"));
+  }
+
+  private String buildShareText(Course course) {
+    String[] routes = course.routeText != null ? course.routeText.split(" > ") : new String[0];
+    String routeLine = TextUtils.join(" → ", routes);
+    String tagLine = course.tagsText != null ? course.tagsText.replace(",", " ") : "";
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(course.title).append('\n');
+    if (!routeLine.isEmpty()) sb.append(routeLine).append('\n');
+    if (!tagLine.isEmpty()) sb.append(tagLine).append('\n');
+    sb.append(course.ratingText).append(" · 장소 ").append(routes.length).append("곳");
+    return sb.toString();
+  }
+
+  // 찜하기
   private void toggleFavorite() {
     if (currentCourse == null) {
       Toast.makeText(this, "코스 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -170,5 +196,6 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     moveInfoText.setText("이전 화면에서 전달된 courseId를 확인해주세요.");
     favoriteText.setText("찜하기");
     favoriteButton.setEnabled(false);
+    shareButton.setEnabled(false);
   }
 }

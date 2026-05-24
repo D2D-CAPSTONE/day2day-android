@@ -14,7 +14,8 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher_composite"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Day2day">
+        android:theme="@style/Theme.Day2day"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".presentation.recommend.flow.CourseDetailPageActivity"
