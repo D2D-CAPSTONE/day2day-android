@@ -94,7 +94,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
     String keyword = getIntent().getStringExtra("FILTER_KEYWORD");
     if (keyword == null || keyword.isEmpty()) {
-      keyword = "강남역 데이트"; // FilteringActivity가 원복되었으므로 기본값 사용
+      keyword = "강남역 데이트"; // 기본값
     }
     fetchCoursesFromServer(keyword);
   }
@@ -224,6 +224,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
         || category.contains("중식")
         || category.contains("양식")
         || category.contains("파스타")
+        || category.contains("음식점")
         || category.contains("레스토랑")) {
       return PlaceType.MEAL;
     } else if (category.contains("카페") || category.contains("디저트")) {
@@ -232,6 +233,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
         || category.contains("전시")
         || category.contains("공원")
         || category.contains("오락")
+        || category.contains("술집")
         || category.contains("PC방")) {
       return PlaceType.ACTIVITY;
     }
