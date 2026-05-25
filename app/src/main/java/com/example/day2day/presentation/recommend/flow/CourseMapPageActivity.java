@@ -79,6 +79,12 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     if (keyword == null || keyword.isEmpty()) {
       keyword = "연남동 데이트";
     }
+
+    ArrayList<String> moods = getIntent().getStringArrayListExtra("FILTER_MOODS");
+    if (moods != null && !moods.isEmpty()) {
+      keyword = keyword + " " + android.text.TextUtils.join(" ", moods);
+    }
+
     fetchCoursesFromServer(keyword);
   }
 
@@ -155,14 +161,6 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
   @Override
   public void onMapReady(@NonNull NaverMap naverMap) {
     this.naverMap = naverMap;
-    List<CourseDto> courseList = fetchDummyCourses();
-
-    RecyclerView rvCourseList = findViewById(R.id.rv_course_list);
-    rvCourseList.setLayoutManager(
-        new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-
-    CourseAdapter adapter = new CourseAdapter(courseList, this::changeMapToCourse);
-    rvCourseList.setAdapter(adapter);
 
     if (!courseList.isEmpty()) {
       changeMapToCourse(courseList.get(0));

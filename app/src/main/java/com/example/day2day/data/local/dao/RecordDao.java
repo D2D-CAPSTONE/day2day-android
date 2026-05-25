@@ -20,4 +20,10 @@ public interface RecordDao {
           + "JOIN records ON courses.courseId = records.courseId "
           + "ORDER BY records.visitedAt DESC")
   List<Course> getRecordedCourses();
+
+  @Query("SELECT COUNT(*) FROM records WHERE courseId = :courseId")
+  int isRecorded(String courseId);
+
+  @Query("DELETE FROM records WHERE courseId = :courseId")
+  void deleteRecordByCourseId(String courseId);
 }
