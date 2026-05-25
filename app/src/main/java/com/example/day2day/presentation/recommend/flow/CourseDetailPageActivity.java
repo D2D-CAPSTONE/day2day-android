@@ -41,8 +41,8 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   private View favoriteButton;
   private TextView favoriteText;
   private TextView titleText;
-  private TextView ratingText;
-  private TextView placeCountText;
+  private TextView timeText;
+  private TextView distanceText;
   private TextView tagsText;
   private RecyclerView rvPlaces;
 
@@ -76,8 +76,8 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     favoriteButton = findViewById(R.id.btn_course_detail_favorite);
     favoriteText = findViewById(R.id.tv_course_detail_favorite);
     titleText = findViewById(R.id.tv_course_detail_title);
-    ratingText = findViewById(R.id.tv_course_detail_rating);
-    placeCountText = findViewById(R.id.tv_course_detail_place_count);
+    timeText = findViewById(R.id.tv_course_detail_time);
+    distanceText = findViewById(R.id.tv_course_detail_distance);
     tagsText = findViewById(R.id.tv_course_detail_tags);
     rvPlaces = findViewById(R.id.rv_course_detail_places);
     rvPlaces.setLayoutManager(new LinearLayoutManager(this));
@@ -127,9 +127,10 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   // 가져온 코스 정보를 UI에 렌더링
   private void renderCourse(Course course, List<PlaceItem> placeItems) {
     titleText.setText(course.title);
-    ratingText.setText(course.ratingText);
     tagsText.setText(course.tagsText.replace(",", "  "));
-    placeCountText.setText("장소 " + placeItems.size() + "곳");
+    double totalMeters = calculateTotalDistance(placeItems);
+    timeText.setText(formatTime(totalMeters));
+    distanceText.setText(formatDistance(totalMeters));
     rvPlaces.setAdapter(new PlaceAdapter(placeItems, course.thumbColor));
   }
 
@@ -187,7 +188,8 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     sb.append(course.title).append('\n');
     if (!routeLine.isEmpty()) sb.append(routeLine).append('\n');
     if (!tagLine.isEmpty()) sb.append(tagLine).append('\n');
-    sb.append(course.ratingText).append(" · 장소 ").append(currentPlaceItems.size()).append("곳");
+    double totalMeters = calculateTotalDistance(currentPlaceItems);
+    sb.append(formatTime(totalMeters)).append(" · ").append(formatDistance(totalMeters));
     return sb.toString();
   }
 
@@ -227,12 +229,60 @@ public class CourseDetailPageActivity extends AppCompatActivity {
 
   private void showMissingCourse() {
     titleText.setText("코스 정보를 찾을 수 없습니다");
-    ratingText.setText("-");
-    placeCountText.setText("장소 0곳");
+    timeText.setText("-");
+    distanceText.setText("-");
     tagsText.setText("");
     favoriteText.setText("찜하기");
     favoriteButton.setEnabled(false);
     shareButton.setEnabled(false);
+  }
+
+// 위경도 기준으로 두 좌표 사이의 직선 거리 계산
+  private double calculateHaversineDistance(double lat1, double lng1, double lat2, double lng2) {
+    final int R = 6371000;
+    double phi1 = Math.toRadians(lat1);
+    double phi2 = Math.toRadians(lat2);
+    double deltaPhi = Math.toRadians(lat2 - lat1);
+    double deltaLambda = Math.toRadians(lng2 - lng1);
+    double a =
+        Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2)
+            + Math.cos(phi1)
+                * Math.cos(phi2)
+                * Math.sin(deltaLambda / 2)
+                * Math.sin(deltaLambda / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  // 연속 장소들 사이 거리 합산
+  private double calculateTotalDistance(List<PlaceItem> places) {
+    double total = 0;
+    for (int i = 0; i < places.size() - 1; i++) {
+      PlaceItem from = places.get(i);
+      PlaceItem to = places.get(i + 1);
+      if (from.hasCoords() && to.hasCoords()) {
+        total += calculateHaversineDistance(from.lat, from.lng, to.lat, to.lng);
+      }
+    }
+    return total;
+  }
+
+// 1000m 이상이면 km로, 미만이면 m로 표기
+  private String formatDistance(double meters) {
+    if (meters <= 0) return "-";
+    if (meters >= 1000)
+      return String.format(java.util.Locale.getDefault(), "총 %.1fkm", meters / 1000);
+    return "총 " + (int) Math.round(meters) + "m";
+  }
+
+// 도보 기준으로 시간 계산 67m/min -> 1km당 약 15분, 500m면 약 5분 -> 총 거리 기준으로 시간 표기
+  private String formatTime(double meters) {
+    if (meters <= 0) return "-";
+    int minutes = (int) Math.round(meters / 67.0);
+    if (minutes < 1) return "약 1분";
+    if (minutes < 60) return "약 " + minutes + "분";
+    int hours = minutes / 60;
+    int rem = minutes % 60;
+    return rem == 0 ? "약 " + hours + "시간" : "약 " + hours + "시간 " + rem + "분";
   }
 
   private static class PlaceItem {
