@@ -315,6 +315,7 @@
                 app:strokeWidth="1dp">
 
                 <RadioGroup
+                    android:id="@+id/rg_sort"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checkedButton="@+id/rb_recommended"
@@ -335,6 +336,7 @@
                         android:background="#172A1F2D" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_distance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
@@ -348,6 +350,7 @@
                         android:background="#172A1F2D" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_popular"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"

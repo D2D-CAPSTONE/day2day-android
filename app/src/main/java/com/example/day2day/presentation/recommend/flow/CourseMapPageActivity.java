@@ -79,10 +79,19 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     if (keyword == null || keyword.isEmpty()) {
       keyword = "연남동 데이트";
     }
-    fetchCoursesFromServer(keyword);
+
+    ArrayList<String> moods = getIntent().getStringArrayListExtra("FILTER_MOODS");
+    if (moods != null && !moods.isEmpty()) {
+      keyword = keyword + " " + String.join(" ", moods);
+    }
+
+    String sortOrder = getIntent().getStringExtra("FILTER_SORT");
+    if (sortOrder == null) sortOrder = "recommended";
+
+    fetchCoursesFromServer(keyword, sortOrder);
   }
 
-  private void fetchCoursesFromServer(String keyword) {
+  private void fetchCoursesFromServer(String keyword, String sortOrder) {
     courseEngine.fetchNearbyPlaces(
         keyword,
         new NearbyCourseEngine.FetchPlacesCallback() {
