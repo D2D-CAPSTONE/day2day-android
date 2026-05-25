@@ -38,49 +38,57 @@ public class FilteringActivity extends AppCompatActivity {
     ChipGroup chipGroupMood = findViewById(R.id.chip_group_mood);
     RadioGroup rgSort = findViewById(R.id.rg_sort);
 
+    // 지역 선택 화면에서 넘어온 경우 위치 필드 자동 채우기
+    String districtName = getIntent().getStringExtra("district_name");
+    if (districtName != null && !districtName.isEmpty()) {
+      etLocation.setText("서울시 " + districtName);
+    }
+
     btnClose.setOnClickListener(v -> finish());
 
-    btnReset.setOnClickListener(v -> {
-      for (int chipId : MOOD_CHIP_IDS) {
-        Chip chip = chipGroupMood.findViewById(chipId);
-        if (chip != null) chip.setChecked(false);
-      }
-      etLocation.setText("");
-      rgSort.check(R.id.rb_recommended);
-    });
+    btnReset.setOnClickListener(
+        v -> {
+          for (int chipId : MOOD_CHIP_IDS) {
+            Chip chip = chipGroupMood.findViewById(chipId);
+            if (chip != null) chip.setChecked(false);
+          }
+          etLocation.setText("");
+          rgSort.check(R.id.rb_recommended);
+        });
 
-    nextButton.setOnClickListener(v -> {
-      // 위치 키워드
-      String location = "연남동 데이트";
-      if (etLocation.getText() != null && !etLocation.getText().toString().isEmpty()) {
-        location = etLocation.getText().toString();
-      }
+    nextButton.setOnClickListener(
+        v -> {
+          // 위치 키워드
+          String location = "연남동 데이트";
+          if (etLocation.getText() != null && !etLocation.getText().toString().isEmpty()) {
+            location = etLocation.getText().toString();
+          }
 
-      // 선택된 분위기 칩 수집
-      ArrayList<String> selectedMoods = new ArrayList<>();
-      for (int chipId : MOOD_CHIP_IDS) {
-        Chip chip = chipGroupMood.findViewById(chipId);
-        if (chip != null && chip.isChecked()) {
-          selectedMoods.add(chip.getText().toString());
-        }
-      }
+          // 선택된 분위기 칩 수집
+          ArrayList<String> selectedMoods = new ArrayList<>();
+          for (int chipId : MOOD_CHIP_IDS) {
+            Chip chip = chipGroupMood.findViewById(chipId);
+            if (chip != null && chip.isChecked()) {
+              selectedMoods.add(chip.getText().toString());
+            }
+          }
 
-      // 정렬 기준
-      String sortOrder;
-      int checkedId = rgSort.getCheckedRadioButtonId();
-      if (checkedId == R.id.rb_distance) {
-        sortOrder = "distance";
-      } else if (checkedId == R.id.rb_popular) {
-        sortOrder = "popular";
-      } else {
-        sortOrder = "recommended";
-      }
+          // 정렬 기준
+          String sortOrder;
+          int checkedId = rgSort.getCheckedRadioButtonId();
+          if (checkedId == R.id.rb_distance) {
+            sortOrder = "distance";
+          } else if (checkedId == R.id.rb_popular) {
+            sortOrder = "popular";
+          } else {
+            sortOrder = "recommended";
+          }
 
-      Intent intent = new Intent(FilteringActivity.this, CourseMapPageActivity.class);
-      intent.putExtra("FILTER_KEYWORD", location);
-      intent.putStringArrayListExtra("FILTER_MOODS", selectedMoods);
-      intent.putExtra("FILTER_SORT", sortOrder);
-      startActivity(intent);
-    });
+          Intent intent = new Intent(FilteringActivity.this, CourseMapPageActivity.class);
+          intent.putExtra("FILTER_KEYWORD", location);
+          intent.putStringArrayListExtra("FILTER_MOODS", selectedMoods);
+          intent.putExtra("FILTER_SORT", sortOrder);
+          startActivity(intent);
+        });
   }
 }

@@ -82,16 +82,13 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
     ArrayList<String> moods = getIntent().getStringArrayListExtra("FILTER_MOODS");
     if (moods != null && !moods.isEmpty()) {
-      keyword = keyword + " " + String.join(" ", moods);
+      keyword = keyword + " " + android.text.TextUtils.join(" ", moods);
     }
 
-    String sortOrder = getIntent().getStringExtra("FILTER_SORT");
-    if (sortOrder == null) sortOrder = "recommended";
-
-    fetchCoursesFromServer(keyword, sortOrder);
+    fetchCoursesFromServer(keyword);
   }
 
-  private void fetchCoursesFromServer(String keyword, String sortOrder) {
+  private void fetchCoursesFromServer(String keyword) {
     courseEngine.fetchNearbyPlaces(
         keyword,
         new NearbyCourseEngine.FetchPlacesCallback() {

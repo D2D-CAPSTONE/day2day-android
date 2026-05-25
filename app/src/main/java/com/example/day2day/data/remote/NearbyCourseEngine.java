@@ -3,6 +3,8 @@ package com.example.day2day.data.remote;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -16,9 +18,18 @@ public class NearbyCourseEngine {
   public NearbyCourseEngine() {
     Gson gson = new GsonBuilder().setLenient().create();
 
+    // 타임 아웃
+    OkHttpClient okHttpClient =
+        new OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build();
+
     Retrofit retrofit =
         new Retrofit.Builder()
             .baseUrl("http://34.47.126.220/")
+            .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build();
 
@@ -33,7 +44,17 @@ public class NearbyCourseEngine {
 
   public void fetchNearbyPlaces(String keyword, FetchPlacesCallback callback) {
     Call<List<BackendPlaceResponse>> call = apiService.searchNaverMap(keyword, 1);
+    enqueueCall(call, callback);
+  }
 
+  public void fetchNearbyPlacesByCoordinate(
+      String keyword, String longitude, String latitude, FetchPlacesCallback callback) {
+    Call<List<BackendPlaceResponse>> call =
+        apiService.searchNaverMapByCoordinate(keyword, longitude, latitude);
+    enqueueCall(call, callback);
+  }
+
+  private void enqueueCall(Call<List<BackendPlaceResponse>> call, FetchPlacesCallback callback) {
     call.enqueue(
         new Callback<List<BackendPlaceResponse>>() {
           @Override
