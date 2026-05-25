@@ -34,6 +34,7 @@ import com.naver.maps.map.overlay.PathOverlay;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class CourseMapPageActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -96,54 +97,110 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     if (keyword == null || keyword.isEmpty()) {
       keyword = "강남역 데이트"; // 기본값
     }
-    fetchCoursesFromServer(keyword);
+
+    fetchCoursesIndividually(keyword);
   }
 
-  private void fetchCoursesFromServer(String keyword) {
+  private void fetchCoursesIndividually(String baseKeyword) {
+    String baseDistrict = baseKeyword.replace(" 데이트", "");
+
+    List<BackendPlaceResponse> allMeals = new ArrayList<>();
+    List<BackendPlaceResponse> allCafes = new ArrayList<>();
+    List<BackendPlaceResponse> allActivities = new ArrayList<>();
+
+    AtomicInteger completedRequests = new AtomicInteger(0);
+
+    // 1. 식당 검색
     courseEngine.fetchNearbyPlaces(
-        keyword,
+        baseDistrict + " 맛집 데이트",
         new NearbyCourseEngine.FetchPlacesCallback() {
           @Override
           public void onSuccess(List<BackendPlaceResponse> places) {
-            Log.d(TAG, "서버 통신 성공. 받은 장소 개수: " + places.size());
-            saveCoursesToDatabase(keyword, places);
+            Log.d(TAG, "맛집 데이트 검색 완료: " + places.size() + "개");
+            allMeals.addAll(places);
+            checkAndCombineCourses(
+                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
           }
 
           @Override
           public void onFailure(String errorMessage) {
-            Log.e(TAG, "서버 통신 실패: " + errorMessage);
-            runOnUiThread(
-                () ->
-                    Toast.makeText(CourseMapPageActivity.this, errorMessage, Toast.LENGTH_SHORT)
-                        .show());
+            Log.e(TAG, "맛집 데이트 검색 실패: " + errorMessage);
+            checkAndCombineCourses(
+                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+          }
+        });
+
+    // 2. 카페 검색
+    courseEngine.fetchNearbyPlaces(
+        baseDistrict + " 카페 데이트",
+        new NearbyCourseEngine.FetchPlacesCallback() {
+          @Override
+          public void onSuccess(List<BackendPlaceResponse> places) {
+            Log.d(TAG, "카페 데이트 검색 완료: " + places.size() + "개");
+            allCafes.addAll(places);
+            checkAndCombineCourses(
+                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+          }
+
+          @Override
+          public void onFailure(String errorMessage) {
+            Log.e(TAG, "카페 데이트 검색 실패: " + errorMessage);
+            checkAndCombineCourses(
+                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+          }
+        });
+
+    // 3. 놀거리 검색
+    courseEngine.fetchNearbyPlaces(
+        baseDistrict + " 놀거리 데이트",
+        new NearbyCourseEngine.FetchPlacesCallback() {
+          @Override
+          public void onSuccess(List<BackendPlaceResponse> places) {
+            Log.d(TAG, "놀거리 데이트 검색 완료: " + places.size() + "개");
+            allActivities.addAll(places);
+            checkAndCombineCourses(
+                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+          }
+
+          @Override
+          public void onFailure(String errorMessage) {
+            Log.e(TAG, "놀거리 데이트 검색 실패: " + errorMessage);
+            checkAndCombineCourses(
+                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
           }
         });
   }
 
-  private void saveCoursesToDatabase(String keyword, List<BackendPlaceResponse> places) {
-    List<BackendPlaceResponse> meals = new ArrayList<>();
-    List<BackendPlaceResponse> cafes = new ArrayList<>();
-    List<BackendPlaceResponse> activities = new ArrayList<>();
-
-    Log.d(TAG, "--- 카테고리 분류 시작 ---");
-    for (BackendPlaceResponse place : places) {
-      PlaceType type = getPlaceType(place.getCategory());
-      Log.d(TAG, "장소: " + place.getName() + " / 카테고리: " + place.getCategory() + " -> 분류: " + type);
-      switch (type) {
-        case MEAL:
-          meals.add(place);
-          break;
-        case CAFE:
-          cafes.add(place);
-          break;
-        case ACTIVITY:
-          activities.add(place);
-          break;
-        default:
-          break;
-      }
+  private void checkAndCombineCourses(
+      String keyword,
+      List<BackendPlaceResponse> meals,
+      List<BackendPlaceResponse> cafes,
+      List<BackendPlaceResponse> activities,
+      AtomicInteger completedRequests) {
+    if (completedRequests.incrementAndGet() == 3) {
+      Log.d(TAG, "모든 개별 검색 완료. 조합 시작.");
+      saveCoursesToDatabaseStrict(keyword, meals, cafes, activities);
     }
-    Log.d(TAG, "--- 카테고리 분류 완료 ---");
+  }
+
+  private void saveCoursesToDatabaseStrict(
+      String keyword,
+      List<BackendPlaceResponse> rawMeals,
+      List<BackendPlaceResponse> rawCafes,
+      List<BackendPlaceResponse> rawActivities) {
+    List<BackendPlaceResponse> meals = new ArrayList<>();
+    for (BackendPlaceResponse p : rawMeals)
+      if (getPlaceType(p.getCategory()) == PlaceType.MEAL) meals.add(p);
+
+    List<BackendPlaceResponse> cafes = new ArrayList<>();
+    for (BackendPlaceResponse p : rawCafes)
+      if (getPlaceType(p.getCategory()) == PlaceType.CAFE) cafes.add(p);
+
+    List<BackendPlaceResponse> activities = new ArrayList<>();
+    for (BackendPlaceResponse p : rawActivities)
+      if (getPlaceType(p.getCategory()) == PlaceType.ACTIVITY) activities.add(p);
+
+    Log.d(TAG, "--- 최종 카테고리 필터링 완료 ---");
     Log.d(
         TAG,
         "분류 결과: 식사("
@@ -166,6 +223,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     for (int i = 0; i < maxCourses; i++) {
       List<BackendPlaceResponse> coursePlacesResponse =
           List.of(meals.get(i), cafes.get(i), activities.get(i));
+
       String newCourseId = "API-" + UUID.randomUUID().toString();
       String courseTitle = keyword + " 추천 코스 " + (i + 1);
       String routeText =
