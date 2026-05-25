@@ -21,7 +21,9 @@ import com.example.day2day.R;
 import com.example.day2day.data.CourseContract;
 import com.example.day2day.data.local.CourseDatabase;
 import com.example.day2day.data.local.entity.Course;
+import com.example.day2day.data.local.entity.CoursePlace;
 import com.example.day2day.data.local.entity.Favorite;
+import com.example.day2day.data.local.entity.Record;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,11 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   private String courseId;
   private Course currentCourse;
   private boolean isFavorite;
+  private List<PlaceItem> currentPlaceItems = new ArrayList<>();
 
+  private View confirmButton;
+  private TextView confirmText;
+  private boolean isConfirmed;
   private View shareButton;
   private View favoriteButton;
   private TextView favoriteText;
@@ -54,13 +60,8 @@ public class CourseDetailPageActivity extends AppCompatActivity {
 
     bindViews();
 
-    CourseDto dto = (CourseDto) getIntent().getSerializableExtra("SELECTED_COURSE");
-    if (dto != null) {
-      loadCourseFromDto(dto);
-    } else {
-      courseId = getIntent().getStringExtra(CourseContract.EXTRA_COURSE_ID);
-      loadCourse();
-    }
+    courseId = getIntent().getStringExtra(CourseContract.EXTRA_COURSE_ID);
+    loadCourse();
   }
 
   // 뒤로가기 버튼, corseMapPage로만 가서 요청 들어온 곳으로 다시 돌아가게 해야됨
@@ -69,6 +70,8 @@ public class CourseDetailPageActivity extends AppCompatActivity {
 
     goCourseMapButton.setOnClickListener(v -> finish());
 
+    confirmButton = findViewById(R.id.btn_course_detail_confirm);
+    confirmText = findViewById(R.id.tv_course_detail_confirm);
     shareButton = findViewById(R.id.btn_course_detail_share);
     favoriteButton = findViewById(R.id.btn_course_detail_favorite);
     favoriteText = findViewById(R.id.tv_course_detail_favorite);
@@ -80,44 +83,9 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     rvPlaces.setLayoutManager(new LinearLayoutManager(this));
     rvPlaces.setNestedScrollingEnabled(false);
 
+    confirmButton.setOnClickListener(v -> confirmCourse());
     shareButton.setOnClickListener(v -> shareCourse());
     favoriteButton.setOnClickListener(v -> toggleFavorite());
-  }
-
-  private void loadCourseFromDto(CourseDto dto) {
-    StringBuilder routeBuilder = new StringBuilder();
-    List<PlaceItem> placeItems = new ArrayList<>();
-    for (int i = 0; i < dto.places.size(); i++) {
-      if (i > 0) routeBuilder.append(" > ");
-      PlaceDto p = dto.places.get(i);
-      routeBuilder.append(p.placeName);
-      placeItems.add(new PlaceItem(p.placeName, p.latitude, p.longitude));
-    }
-
-    Course course =
-        new Course(
-            dto.courseName,
-            dto.courseName,
-            routeBuilder.toString(),
-            "",
-            "",
-            Color.parseColor("#FCE8EC"));
-
-    courseId = course.courseId;
-
-    CourseDatabase.databaseExecutor.execute(
-        () -> {
-          database.courseDao().insertCourse(course);
-          boolean favorite = database.favoriteDao().isFavorite(courseId) > 0;
-          runOnUiThread(
-              () -> {
-                currentCourse = course;
-                isFavorite = favorite;
-                renderCourse(course, placeItems);
-                updateFavoriteUi();
-                shareButton.setEnabled(true);
-              });
-        });
   }
 
   // courseId로 코스 정보를 가져오기
@@ -131,20 +99,26 @@ public class CourseDetailPageActivity extends AppCompatActivity {
         () -> {
           Course course = database.courseDao().getCourseById(courseId);
           boolean favorite = database.favoriteDao().isFavorite(courseId) > 0;
+          List<CoursePlace> coursePlaces = database.coursePlaceDao().getPlacesByCourseId(courseId);
+          boolean confirmed = database.recordDao().isRecorded(courseId) > 0;
 
           runOnUiThread(
               () -> {
                 currentCourse = course;
                 isFavorite = favorite;
+                isConfirmed = confirmed;
                 if (currentCourse == null) {
                   showMissingCourse();
                   return;
                 }
-                String[] routes = currentCourse.routeText.split(" > ");
                 List<PlaceItem> placeItems = new ArrayList<>();
-                for (String name : routes) placeItems.add(new PlaceItem(name));
+                for (CoursePlace p : coursePlaces) {
+                  placeItems.add(new PlaceItem(p.placeName, p.latitude, p.longitude));
+                }
+                currentPlaceItems = placeItems;
                 renderCourse(currentCourse, placeItems);
                 updateFavoriteUi();
+                updateConfirmUi();
                 shareButton.setEnabled(true);
               });
         });
@@ -157,6 +131,37 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     tagsText.setText(course.tagsText.replace(",", "  "));
     placeCountText.setText("장소 " + placeItems.size() + "곳");
     rvPlaces.setAdapter(new PlaceAdapter(placeItems, course.thumbColor));
+  }
+
+  private void confirmCourse() {
+    if (currentCourse == null) {
+      Toast.makeText(this, "코스 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    CourseDatabase.databaseExecutor.execute(
+        () -> {
+          if (isConfirmed) {
+            database.recordDao().deleteRecordByCourseId(currentCourse.courseId);
+          } else {
+            database
+                .recordDao()
+                .insertRecord(new Record(currentCourse.courseId, System.currentTimeMillis(), ""));
+          }
+
+          boolean next = !isConfirmed;
+          runOnUiThread(
+              () -> {
+                isConfirmed = next;
+                updateConfirmUi();
+                Toast.makeText(this, isConfirmed ? "코스가 기록됐어요." : "기록이 취소됐어요.", Toast.LENGTH_SHORT)
+                    .show();
+              });
+        });
+  }
+
+  private void updateConfirmUi() {
+    confirmText.setText(isConfirmed ? "확정취소" : "확정하기");
   }
 
   private void shareCourse() {
@@ -173,15 +178,16 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   }
 
   private String buildShareText(Course course) {
-    String[] routes = course.routeText != null ? course.routeText.split(" > ") : new String[0];
-    String routeLine = TextUtils.join(" → ", routes);
+    List<String> names = new ArrayList<>();
+    for (PlaceItem item : currentPlaceItems) names.add(item.name);
+    String routeLine = TextUtils.join(" → ", names);
     String tagLine = course.tagsText != null ? course.tagsText.replace(",", " ") : "";
 
     StringBuilder sb = new StringBuilder();
     sb.append(course.title).append('\n');
     if (!routeLine.isEmpty()) sb.append(routeLine).append('\n');
     if (!tagLine.isEmpty()) sb.append(tagLine).append('\n');
-    sb.append(course.ratingText).append(" · 장소 ").append(routes.length).append("곳");
+    sb.append(course.ratingText).append(" · 장소 ").append(currentPlaceItems.size()).append("곳");
     return sb.toString();
   }
 
