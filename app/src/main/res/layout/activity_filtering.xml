@@ -23,13 +23,16 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/btn_close_filter"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:gravity="center"
             android:text="×"
             android:textColor="#2A1F2D"
             android:textSize="20sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
 
         <TextView
             android:layout_width="0dp"
@@ -43,10 +46,13 @@
             android:textStyle="bold" />
 
         <LinearLayout
+            android:id="@+id/btn_reset_filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:clickable="true"
+            android:focusable="true">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -116,6 +122,7 @@
                     app:startIconTint="#B09AB8">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
@@ -154,6 +161,7 @@
                 android:textStyle="bold" />
 
             <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_group_mood"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:chipSpacingHorizontal="8dp"
@@ -161,101 +169,128 @@
                 app:singleSelection="false">
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_anniversary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="기념일"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_quiet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="조용한"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_budget"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="가성비"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_active"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="활동적인"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_atmosphere"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="분위기 좋은"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#E8506A"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#E8506A"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_rainy"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="비 오는 날"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_insta"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="인스타 감성"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_wide_seat"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="넓은 좌석"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
 
                 <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_pet"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:checkable="true"
                     android:text="반려동물 동반"
+                    android:textColor="@color/chip_text_mood"
                     android:textSize="11sp"
-                    app:chipBackgroundColor="#FFFFFF"
+                    app:chipBackgroundColor="@color/chip_bg_mood"
                     app:chipCornerRadius="20dp"
-                    app:chipStrokeColor="#D1D1D1"
+                    app:chipStrokeColor="@color/chip_stroke_mood"
                     app:chipStrokeWidth="1dp"
                     app:checkedIconVisible="false" />
             </com.google.android.material.chip.ChipGroup>
@@ -280,6 +315,7 @@
                 app:strokeWidth="1dp">
 
                 <RadioGroup
+                    android:id="@+id/rg_sort"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checkedButton="@+id/rb_recommended"
@@ -300,6 +336,7 @@
                         android:background="#172A1F2D" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_distance"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
@@ -313,6 +350,7 @@
                         android:background="#172A1F2D" />
 
                     <com.google.android.material.radiobutton.MaterialRadioButton
+                        android:id="@+id/rb_popular"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="16dp"
