@@ -56,6 +56,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     OTHER
   }
 
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -112,11 +113,11 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
     // 1. 식당 검색
     courseEngine.fetchNearbyPlaces(
-        baseDistrict + " 맛집 데이트",
+        baseDistrict + " 음식점",
         new NearbyCourseEngine.FetchPlacesCallback() {
           @Override
           public void onSuccess(List<BackendPlaceResponse> places) {
-            Log.d(TAG, "맛집 데이트 검색 완료: " + places.size() + "개");
+            Log.d(TAG, "음식점 검색 완료: " + places.size() + "개");
             allMeals.addAll(places);
             checkAndCombineCourses(
                 baseKeyword, allMeals, allCafes, allActivities, completedRequests);
@@ -124,7 +125,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
           @Override
           public void onFailure(String errorMessage) {
-            Log.e(TAG, "맛집 데이트 검색 실패: " + errorMessage);
+            Log.e(TAG, "음식점 검색 실패: " + errorMessage);
             checkAndCombineCourses(
                 baseKeyword, allMeals, allCafes, allActivities, completedRequests);
           }
@@ -132,11 +133,11 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
     // 2. 카페 검색
     courseEngine.fetchNearbyPlaces(
-        baseDistrict + " 카페 데이트",
+        baseDistrict + " 카페",
         new NearbyCourseEngine.FetchPlacesCallback() {
           @Override
           public void onSuccess(List<BackendPlaceResponse> places) {
-            Log.d(TAG, "카페 데이트 검색 완료: " + places.size() + "개");
+            Log.d(TAG, "카페 검색 완료: " + places.size() + "개");
             allCafes.addAll(places);
             checkAndCombineCourses(
                 baseKeyword, allMeals, allCafes, allActivities, completedRequests);
@@ -144,7 +145,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
           @Override
           public void onFailure(String errorMessage) {
-            Log.e(TAG, "카페 데이트 검색 실패: " + errorMessage);
+            Log.e(TAG, "카페 검색 실패: " + errorMessage);
             checkAndCombineCourses(
                 baseKeyword, allMeals, allCafes, allActivities, completedRequests);
           }
@@ -152,11 +153,11 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
     // 3. 놀거리 검색
     courseEngine.fetchNearbyPlaces(
-        baseDistrict + " 놀거리 데이트",
+        baseDistrict + " 놀거리",
         new NearbyCourseEngine.FetchPlacesCallback() {
           @Override
           public void onSuccess(List<BackendPlaceResponse> places) {
-            Log.d(TAG, "놀거리 데이트 검색 완료: " + places.size() + "개");
+            Log.d(TAG, "놀거리 검색 완료: " + places.size() + "개");
             allActivities.addAll(places);
             checkAndCombineCourses(
                 baseKeyword, allMeals, allCafes, allActivities, completedRequests);
@@ -164,7 +165,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
 
           @Override
           public void onFailure(String errorMessage) {
-            Log.e(TAG, "놀거리 데이트 검색 실패: " + errorMessage);
+            Log.e(TAG, "놀거리 검색 실패: " + errorMessage);
             checkAndCombineCourses(
                 baseKeyword, allMeals, allCafes, allActivities, completedRequests);
           }
@@ -188,6 +189,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
       List<BackendPlaceResponse> rawMeals,
       List<BackendPlaceResponse> rawCafes,
       List<BackendPlaceResponse> rawActivities) {
+
     List<BackendPlaceResponse> meals = new ArrayList<>();
     for (BackendPlaceResponse p : rawMeals)
       if (getPlaceType(p.getCategory()) == PlaceType.MEAL) meals.add(p);
@@ -221,6 +223,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     int maxCourses = Math.min(3, Math.min(meals.size(), Math.min(cafes.size(), activities.size())));
 
     for (int i = 0; i < maxCourses; i++) {
+      // 순서: 식사 -> 카페 -> 놀거리
       List<BackendPlaceResponse> coursePlacesResponse =
           List.of(meals.get(i), cafes.get(i), activities.get(i));
 
