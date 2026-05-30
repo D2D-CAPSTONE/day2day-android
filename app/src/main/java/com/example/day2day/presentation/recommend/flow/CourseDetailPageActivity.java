@@ -237,7 +237,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     shareButton.setEnabled(false);
   }
 
-// 위경도 기준으로 두 좌표 사이의 직선 거리 계산
+  // 위경도 기준으로 두 좌표 사이의 직선 거리 계산
   private double calculateHaversineDistance(double lat1, double lng1, double lat2, double lng2) {
     final int R = 6371000;
     double phi1 = Math.toRadians(lat1);
@@ -266,7 +266,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     return total;
   }
 
-// 1000m 이상이면 km로, 미만이면 m로 표기
+  // 1000m 이상이면 km로, 미만이면 m로 표기
   private String formatDistance(double meters) {
     if (meters <= 0) return "-";
     if (meters >= 1000)
@@ -274,7 +274,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     return "총 " + (int) Math.round(meters) + "m";
   }
 
-// 도보 기준으로 시간 계산 67m/min -> 1km당 약 15분, 500m면 약 5분 -> 총 거리 기준으로 시간 표기
+  // 도보 기준으로 시간 계산 67m/min -> 1km당 약 15분, 500m면 약 5분 -> 총 거리 기준으로 시간 표기
   private String formatTime(double meters) {
     if (meters <= 0) return "-";
     int minutes = (int) Math.round(meters / 67.0);
