@@ -156,13 +156,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
-                    android:background="@drawable/shape_tag_rose"
+                    android:background="@drawable/shape_tag_blue_dark"
                     android:paddingStart="10dp"
                     android:paddingTop="3dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="3dp"
                     android:text=""
-                    android:textColor="@color/rose"
+                    android:textColor="@color/blue_text"
                     android:textSize="10sp"
                     android:textStyle="bold" />
 
@@ -171,13 +171,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
-                    android:background="@drawable/shape_tag_rose"
+                    android:background="@drawable/shape_tag_blue_dark"
                     android:paddingStart="10dp"
                     android:paddingTop="3dp"
                     android:paddingEnd="10dp"
                     android:paddingBottom="3dp"
                     android:text=""
-                    android:textColor="@color/rose"
+                    android:textColor="@color/blue_text"
                     android:textSize="10sp"
                     android:textStyle="bold" />
 
@@ -265,6 +265,75 @@
 
         </LinearLayout>
     </FrameLayout>
+
+    <!-- DEBUG: 날씨 전환 버튼 (테스트용 임시) -->
+    <LinearLayout
+        android:id="@+id/debug_weather_strip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#22000000"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp">
+
+        <Button
+            android:id="@+id/dbg_btn_clear"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="☀맑음"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/dbg_btn_clouds"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="☁흐림"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/dbg_btn_rain"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="🌧비"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/dbg_btn_snow"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="❄눈"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/dbg_btn_storm"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="0dp"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="⚡천둥"
+            android:textSize="10sp" />
+    </LinearLayout>
 
     <!-- Scroll Body -->
     <androidx.core.widget.NestedScrollView

@@ -99,6 +99,7 @@ public class HomeFragment extends Fragment {
     fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
     bindWeatherViews(view);
     loadWeather();
+    bindDebugWeatherButtons(view);
     renderCourseCards(view);
   }
 
@@ -210,6 +211,20 @@ public class HomeFragment extends Fragment {
     if (tvWeatherLocation != null) tvWeatherLocation.setText(koreanCity);
     if (tvWeatherDescMini != null) tvWeatherDescMini.setText(desc + " · " + koreanCity);
 
+    updateWeatherTags(weatherMain);
+    updateWeatherVisuals(weatherMain);
+  }
+
+  private void bindDebugWeatherButtons(View view) {
+    view.findViewById(R.id.dbg_btn_clear).setOnClickListener(v -> applyDebugWeather("Clear"));
+    view.findViewById(R.id.dbg_btn_clouds).setOnClickListener(v -> applyDebugWeather("Clouds"));
+    view.findViewById(R.id.dbg_btn_rain).setOnClickListener(v -> applyDebugWeather("Rain"));
+    view.findViewById(R.id.dbg_btn_snow).setOnClickListener(v -> applyDebugWeather("Snow"));
+    view.findViewById(R.id.dbg_btn_storm)
+        .setOnClickListener(v -> applyDebugWeather("Thunderstorm"));
+  }
+
+  private void applyDebugWeather(String weatherMain) {
     updateWeatherTags(weatherMain);
     updateWeatherVisuals(weatherMain);
   }
