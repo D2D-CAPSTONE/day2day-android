@@ -7,19 +7,29 @@ public class BackendPlaceResponse {
   @SerializedName("name")
   private String name;
 
-  @SerializedName("roadAddress")
+  @SerializedName(
+      value = "roadAddress",
+      alternate = {"new_address", "address"})
   private String roadAddress;
 
-  @SerializedName("category")
+  @SerializedName(
+      value = "category",
+      alternate = {"last_cate_name", "cate_name_depth2", "cate_name_depth3"})
   private Object category;
 
-  @SerializedName("imageUrl")
+  @SerializedName(
+      value = "imageUrl",
+      alternate = {"img"})
   private String imageUrl;
 
-  @SerializedName("x")
+  @SerializedName(
+      value = "x",
+      alternate = {"lon"})
   private String x;
 
-  @SerializedName("y")
+  @SerializedName(
+      value = "y",
+      alternate = {"lat"})
   private String y;
 
   public String getName() {
