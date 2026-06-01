@@ -25,25 +25,6 @@
             android:textSize="17sp"
             android:textStyle="bold" />
 
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <ImageView
-            android:id="@+id/iv_search"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:contentDescription="검색"
-            android:src="@drawable/ic_search" />
-
-        <ImageView
-            android:id="@+id/iv_filter"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:layout_marginStart="12dp"
-            android:contentDescription="필터"
-            android:src="@drawable/ic_filter" />
     </LinearLayout>
 
     <!-- Weather Banner -->
