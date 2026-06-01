@@ -1,6 +1,7 @@
 package com.example.day2day.presentation.main.home;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -41,14 +43,22 @@ import java.util.Locale;
 public class HomeFragment extends Fragment {
 
   private static final int PAGE_SIZE = 10;
+  private static final int WEATHER_COLLAPSE_THRESHOLD_DP = 72;
+  private static final int WEATHER_EXPAND_THRESHOLD_DP = 24;
   private int currentOffset = 0;
   private boolean hasMore = false;
   private boolean isLoading = true;
+  private boolean isWeatherCollapsed = false;
+  private int weatherExpandedHeight = 0;
+  private int weatherMiniHeight = 0;
+  private ValueAnimator weatherCollapseAnimator;
   private LinearLayout courseList;
   private View loadMoreView;
 
   private FusedLocationProviderClient fusedLocationClient;
   private FrameLayout weatherBanner;
+  private LinearLayout weatherFull;
+  private LinearLayout weatherMini;
   private ImageView ivWeatherIcon;
   private ImageView ivWeatherIconMini;
   private TextView tvWeatherTemp;
@@ -105,6 +115,11 @@ public class HomeFragment extends Fragment {
 
   private void bindWeatherViews(View view) {
     weatherBanner = view.findViewById(R.id.weather_banner);
+    weatherFull = view.findViewById(R.id.weather_full);
+    weatherMini = view.findViewById(R.id.weather_mini);
+    weatherMiniHeight = dpToPx(52);
+    weatherMini.setAlpha(0f);
+    weatherBanner.post(() -> weatherExpandedHeight = weatherBanner.getHeight());
     ivWeatherIcon = view.findViewById(R.id.iv_weather_icon);
     ivWeatherIconMini = view.findViewById(R.id.iv_weather_icon_mini);
     tvWeatherTemp = view.findViewById(R.id.tv_weather_temp);
@@ -307,6 +322,7 @@ public class HomeFragment extends Fragment {
     scrollBody.setOnScrollChangeListener(
         (NestedScrollView.OnScrollChangeListener)
             (v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+              updateWeatherCollapseState(scrollY);
               if (!v.canScrollVertically(1) && hasMore && !isLoading) {
                 isLoading = true;
                 loadMoreView.setVisibility(View.VISIBLE);
@@ -316,6 +332,69 @@ public class HomeFragment extends Fragment {
             });
 
     loadCoursesFromDatabase();
+  }
+
+  private void updateWeatherCollapseState(int scrollY) {
+    int collapseThreshold = dpToPx(WEATHER_COLLAPSE_THRESHOLD_DP);
+    int expandThreshold = dpToPx(WEATHER_EXPAND_THRESHOLD_DP);
+    if (!isWeatherCollapsed && scrollY >= collapseThreshold) {
+      setWeatherCollapsed(true);
+    } else if (isWeatherCollapsed && scrollY <= expandThreshold) {
+      setWeatherCollapsed(false);
+    }
+  }
+
+  private void setWeatherCollapsed(boolean collapsed) {
+    if (isWeatherCollapsed == collapsed) return;
+    isWeatherCollapsed = collapsed;
+
+    if (weatherBanner == null || weatherFull == null || weatherMini == null) return;
+    if (weatherExpandedHeight == 0) weatherExpandedHeight = weatherBanner.getHeight();
+
+    int startHeight = weatherBanner.getHeight();
+    int endHeight = collapsed ? weatherMiniHeight : weatherExpandedHeight;
+    float startFullAlpha = weatherFull.getAlpha();
+    float endFullAlpha = collapsed ? 0f : 1f;
+    float startMiniAlpha = weatherMini.getAlpha();
+    float endMiniAlpha = collapsed ? 1f : 0f;
+
+    if (weatherCollapseAnimator != null) weatherCollapseAnimator.cancel();
+
+    weatherFull.setVisibility(View.VISIBLE);
+    weatherMini.setVisibility(View.VISIBLE);
+
+    weatherCollapseAnimator = ValueAnimator.ofFloat(0f, 1f);
+    weatherCollapseAnimator.setDuration(180);
+    weatherCollapseAnimator.setInterpolator(new DecelerateInterpolator());
+    weatherCollapseAnimator.addUpdateListener(
+        animation -> {
+          float progress = (float) animation.getAnimatedValue();
+          int height = Math.round(startHeight + (endHeight - startHeight) * progress);
+          ViewGroup.LayoutParams params = weatherBanner.getLayoutParams();
+          params.height = height;
+          weatherBanner.setLayoutParams(params);
+          weatherFull.setAlpha(startFullAlpha + (endFullAlpha - startFullAlpha) * progress);
+          weatherMini.setAlpha(startMiniAlpha + (endMiniAlpha - startMiniAlpha) * progress);
+        });
+    weatherCollapseAnimator.addListener(
+        new android.animation.AnimatorListenerAdapter() {
+          @Override
+          public void onAnimationEnd(android.animation.Animator animation) {
+            weatherFull.setVisibility(collapsed ? View.GONE : View.VISIBLE);
+            weatherMini.setVisibility(collapsed ? View.VISIBLE : View.GONE);
+            weatherFull.setAlpha(collapsed ? 0f : 1f);
+            weatherMini.setAlpha(collapsed ? 1f : 0f);
+
+            ViewGroup.LayoutParams params = weatherBanner.getLayoutParams();
+            params.height = collapsed ? weatherMiniHeight : ViewGroup.LayoutParams.WRAP_CONTENT;
+            weatherBanner.setLayoutParams(params);
+          }
+        });
+    weatherCollapseAnimator.start();
+  }
+
+  private int dpToPx(int dp) {
+    return Math.round(dp * getResources().getDisplayMetrics().density);
   }
 
   private void loadCoursesFromDatabase() {
