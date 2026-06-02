@@ -47,6 +47,9 @@ public class CourseDetailPageActivity extends AppCompatActivity {
   private TextView distanceText;
   private TextView placeCountText;
   private TextView tagsText;
+  private TextView startText;
+  private TextView endText;
+  private TextView routeText;
   private RecyclerView rvPlaces;
   private ArrayList<String> selectedMoods;
 
@@ -85,6 +88,9 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     distanceText = findViewById(R.id.tv_course_detail_distance);
     placeCountText = findViewById(R.id.tv_course_detail_place_count);
     tagsText = findViewById(R.id.tv_course_detail_tags);
+    startText = findViewById(R.id.tv_course_detail_start);
+    endText = findViewById(R.id.tv_course_detail_end);
+    routeText = findViewById(R.id.tv_course_detail_route);
     rvPlaces = findViewById(R.id.rv_course_detail_places);
     rvPlaces.setLayoutManager(new LinearLayoutManager(this));
     rvPlaces.setNestedScrollingEnabled(false);
@@ -144,6 +150,15 @@ public class CourseDetailPageActivity extends AppCompatActivity {
     timeText.setText(formatTime(totalMeters));
     distanceText.setText(formatDistance(totalMeters));
     placeCountText.setText("총 " + placeItems.size() + "곳");
+
+    if (!placeItems.isEmpty()) {
+      startText.setText(placeItems.get(0).name);
+      endText.setText(placeItems.get(placeItems.size() - 1).name);
+      List<String> names = new ArrayList<>();
+      for (PlaceItem p : placeItems) names.add(p.name);
+      routeText.setText(android.text.TextUtils.join(" → ", names));
+    }
+
     rvPlaces.setAdapter(new PlaceAdapter(placeItems, course.thumbColor));
   }
 
@@ -327,6 +342,22 @@ public class CourseDetailPageActivity extends AppCompatActivity {
       Color.parseColor("#9B6BE8"),
     };
 
+    private static final int[] CHIP_ACCENT_COLORS = {
+      Color.parseColor("#E8506A"),
+      Color.parseColor("#6BBDE8"),
+      Color.parseColor("#6BC87A"),
+      Color.parseColor("#E8A350"),
+      Color.parseColor("#9B6BE8"),
+    };
+
+    private static final int[] CHIP_SURFACE_COLORS = {
+      Color.parseColor("#FCE8EC"),
+      Color.parseColor("#E3F4FF"),
+      Color.parseColor("#E9F7EF"),
+      Color.parseColor("#FFF4D6"),
+      Color.parseColor("#F3E8FF"),
+    };
+
     private final List<PlaceItem> places;
     private final int thumbColor;
 
@@ -352,6 +383,19 @@ public class CourseDetailPageActivity extends AppCompatActivity {
 
       holder.tvPlaceNumber.setText(String.valueOf(position + 1));
       holder.cvPlaceNumber.setCardBackgroundColor(BADGE_COLORS[position % BADGE_COLORS.length]);
+
+      int accentColor = CHIP_ACCENT_COLORS[position % CHIP_ACCENT_COLORS.length];
+      int surfaceColor = CHIP_SURFACE_COLORS[position % CHIP_SURFACE_COLORS.length];
+      String chipLabel = position == 0 ? "시작 스팟" : isLast ? "마무리 스팟" : "중간 스팟";
+      holder.tvPlaceChip.setText(chipLabel);
+      holder.tvPlaceChip.setTextColor(accentColor);
+      android.graphics.drawable.GradientDrawable chipBg =
+          new android.graphics.drawable.GradientDrawable();
+      chipBg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+      chipBg.setColor(surfaceColor);
+      chipBg.setCornerRadius(999f);
+      holder.tvPlaceChip.setBackground(chipBg);
+
       holder.tvPlaceTitle.setText(item.name);
       if (item.imageUrl != null && !item.imageUrl.isEmpty()) {
         Glide.with(holder.viewThumb.getContext())
@@ -411,6 +455,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
       final TextView tvPlaceNumber;
       final ImageView viewThumb;
       final View viewLine;
+      final TextView tvPlaceChip;
       final TextView tvPlaceTitle;
       final LinearLayout layoutMoveInfo;
       final TextView tvMoveInfo;
@@ -423,6 +468,7 @@ public class CourseDetailPageActivity extends AppCompatActivity {
         tvPlaceNumber = itemView.findViewById(R.id.tv_place_number);
         viewThumb = itemView.findViewById(R.id.view_place_thumb);
         viewLine = itemView.findViewById(R.id.view_place_line);
+        tvPlaceChip = itemView.findViewById(R.id.tv_place_chip);
         tvPlaceTitle = itemView.findViewById(R.id.tv_place_title);
         layoutMoveInfo = itemView.findViewById(R.id.layout_place_move_info);
         tvMoveInfo = itemView.findViewById(R.id.tv_place_move_info);

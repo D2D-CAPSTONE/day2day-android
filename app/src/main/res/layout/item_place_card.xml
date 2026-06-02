@@ -74,9 +74,19 @@
                     android:padding="12dp">
 
                     <TextView
+                        android:id="@+id/tv_place_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:id="@+id/tv_place_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
                         android:text="장소 이름"
                         android:textColor="#2A1F2D"
                         android:textSize="16sp"
@@ -95,7 +105,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="네이버 지도로 길안내"
+                            android:text="네이버 지도에서 보기"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -132,7 +142,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            app:cardBackgroundColor="#FDE8ED"
+            app:cardBackgroundColor="#FFFCFA"
             app:cardCornerRadius="12dp"
             app:cardElevation="0dp">
 
