@@ -60,11 +60,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <View
+                <ImageView
                     android:id="@+id/view_place_thumb"
                     android:layout_width="match_parent"
                     android:layout_height="170dp"
-                    android:background="#F4E0E4" />
+                    android:background="#F4E0E4"
+                    android:scaleType="centerCrop" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -73,9 +74,19 @@
                     android:padding="12dp">
 
                     <TextView
+                        android:id="@+id/tv_place_chip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
                         android:id="@+id/tv_place_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
                         android:text="장소 이름"
                         android:textColor="#2A1F2D"
                         android:textSize="16sp"
@@ -94,7 +105,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:text="네이버 지도로 길안내"
+                            android:text="네이버 지도에서 보기"
                             android:textColor="#FFFFFF"
                             android:textSize="12sp"
                             android:textStyle="bold" />
@@ -108,13 +119,14 @@
         android:id="@+id/layout_place_move_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="3dp"
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="22dp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <ImageView
@@ -124,14 +136,42 @@
                 app:tint="#B09AB8" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tv_place_move_info"
-            android:layout_width="wrap_content"
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:text="다음 장소로 이동"
-            android:textColor="#B09AB8"
-            android:textSize="12sp" />
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            app:cardBackgroundColor="#FFFCFA"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:id="@+id/tv_place_move_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="다음 장소로 이동"
+                    android:textColor="#7A4E5E"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_place_move_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="#A06070"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
     </LinearLayout>
 
 </LinearLayout>

@@ -279,6 +279,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
               new CoursePlace(
                   newCourseId,
                   place.getName(),
+                  place.getImageUrl(),
                   Double.parseDouble(place.getY()),
                   Double.parseDouble(place.getX()),
                   j));

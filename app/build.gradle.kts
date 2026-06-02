@@ -46,6 +46,7 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.naver.maps:map-sdk:3.23.2")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }
 
 spotless {
