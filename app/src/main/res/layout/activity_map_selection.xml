@@ -4,14 +4,15 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFAF5F0">
+    android:background="#FFFAF5F0"
+    android:fitsSystemWindows="true">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="56dp"
+        android:layout_height="56dp"
         android:background="@android:color/white"
+        android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,8 +25,8 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <TextView
                 android:id="@+id/tv_back"
@@ -78,11 +79,11 @@
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingStart="24dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="120dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingStart="16dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
@@ -216,10 +217,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#FFFAF5F0"
-        android:paddingStart="20dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -227,7 +228,7 @@
         <Button
             android:id="@+id/btn_map_selection_confirm"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="52dp"
             android:backgroundTint="#FFE8506A"
             android:enabled="false"
             android:text="지역을 선택해주세요"

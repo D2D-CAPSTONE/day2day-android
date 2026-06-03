@@ -18,11 +18,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 import com.example.day2day.R;
-import com.example.day2day.presentation.common.NavigationBarInsetHelper;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,16 +30,7 @@ public class MapSelectionActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
     setContentView(R.layout.activity_map_selection);
-
-    WindowInsetsControllerCompat controller =
-        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-    controller.setAppearanceLightStatusBars(true);
-
-    View root = findViewById(R.id.root);
-    Toolbar toolbar = findViewById(R.id.toolbar);
-    NavigationBarInsetHelper.applyTopInset(root, toolbar);
 
     SeoulMapView mapView = findViewById(R.id.seoul_map);
     TextView tvSelected = findViewById(R.id.tv_selected_name);

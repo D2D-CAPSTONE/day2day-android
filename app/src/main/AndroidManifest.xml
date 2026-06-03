@@ -23,14 +23,21 @@
 
         <activity
             android:name=".presentation.recommend.flow.CourseMapPageActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
 
         <activity
             android:name=".presentation.recommend.flow.FilteringActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
 
         <activity
             android:name=".presentation.recommend.flow.MapPageActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Day2day.NoActionBar" />
+
+        <activity
+            android:name=".presentation.recommend.flow.StartLocationPickerActivity"
             android:exported="false" />
 
         <activity

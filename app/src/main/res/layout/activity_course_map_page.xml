@@ -10,7 +10,6 @@
         android:name="com.naver.maps.map.MapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="56dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="81dp" />
