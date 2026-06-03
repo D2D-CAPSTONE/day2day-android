@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -11,6 +12,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.example.day2day.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -98,6 +100,7 @@ public class FilteringActivity extends AppCompatActivity {
     locationInput = findViewById(R.id.et_location);
     chipGroupMood = findViewById(R.id.chip_group_mood);
     sortRadioGroup = findViewById(R.id.rg_sort);
+    applyMoodChipStateColors();
     TextInputLayout locationInputLayout = findViewById(R.id.til_location);
     MaterialButton nextButton = findViewById(R.id.btn_filtering_next);
     MaterialButton useCurrentLocationButton = findViewById(R.id.btn_use_current_location);
@@ -168,6 +171,41 @@ public class FilteringActivity extends AppCompatActivity {
     }
 
     updateLocationUi();
+  }
+
+  private void applyMoodChipStateColors() {
+    int[][] states = {new int[] {android.R.attr.state_checked}, new int[] {}};
+    ColorStateList backgroundColors =
+        new ColorStateList(
+            states,
+            new int[] {
+              ContextCompat.getColor(this, R.color.rose_light),
+              ContextCompat.getColor(this, R.color.white)
+            });
+    ColorStateList textColors =
+        new ColorStateList(
+            states,
+            new int[] {
+              ContextCompat.getColor(this, R.color.rose),
+              ContextCompat.getColor(this, R.color.text_dark)
+            });
+    ColorStateList strokeColors =
+        new ColorStateList(
+            states,
+            new int[] {
+              ContextCompat.getColor(this, R.color.rose),
+              ContextCompat.getColor(this, R.color.border_color)
+            });
+
+    for (int chipId : MOOD_CHIP_IDS) {
+      Chip chip = chipGroupMood.findViewById(chipId);
+      if (chip == null) {
+        continue;
+      }
+      chip.setChipBackgroundColor(backgroundColors);
+      chip.setTextColor(textColors);
+      chip.setChipStrokeColor(strokeColors);
+    }
   }
 
   private void useCurrentLocation() {
