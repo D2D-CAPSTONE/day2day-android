@@ -2,6 +2,9 @@ package com.example.day2day.presentation.main;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import com.example.day2day.R;
 import com.example.day2day.presentation.main.favorites.FavoritesFragment;
@@ -16,6 +19,22 @@ public class MainActivity extends AppCompatActivity {
     setContentView(R.layout.activity_main);
 
     BottomNavigationView bottomNavigation = findViewById(R.id.bottom_navigation);
+
+    ViewCompat.setOnApplyWindowInsetsListener(
+        findViewById(R.id.main_fragment_container),
+        (v, insets) -> {
+          Insets statusBar = insets.getInsets(WindowInsetsCompat.Type.statusBars());
+          v.setPadding(0, statusBar.top, 0, 0);
+          return insets;
+        });
+
+    ViewCompat.setOnApplyWindowInsetsListener(
+        bottomNavigation,
+        (v, insets) -> {
+          Insets navBar = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+          v.setPadding(0, 0, 0, navBar.bottom);
+          return insets;
+        });
     bottomNavigation.setOnItemSelectedListener(
         item -> {
           int itemId = item.getItemId();

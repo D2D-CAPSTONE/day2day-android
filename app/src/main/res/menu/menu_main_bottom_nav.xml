@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/menu_home"
-        android:icon="@android:drawable/ic_menu_view"
+        android:icon="@drawable/selector_nav_home"
         android:title="홈" />
 
     <item
         android:id="@+id/menu_favorites"
-        android:icon="@android:drawable/btn_star_big_on"
+        android:icon="@drawable/selector_nav_favorites"
         android:title="찜" />
 
     <item
         android:id="@+id/menu_record"
-        android:icon="@android:drawable/ic_menu_recent_history"
+        android:icon="@drawable/ic_nav_record"
         android:title="기록" />
 
 </menu>

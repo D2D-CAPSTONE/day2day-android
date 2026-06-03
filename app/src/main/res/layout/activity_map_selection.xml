@@ -4,14 +4,15 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFAF5F0">
+    android:background="#FFFAF5F0"
+    android:fitsSystemWindows="true">
 
-    <!-- Header (HTML: sticky top bar) -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="56dp"
         android:background="@android:color/white"
+        android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,8 +25,8 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
             <TextView
                 android:id="@+id/tv_back"
@@ -72,18 +73,17 @@
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
 
-    <!-- Main content -->
     <ScrollView
         android:id="@+id/scroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
         android:fillViewport="true"
-        android:paddingStart="24dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="120dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingStart="16dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp"
+        app:layout_constraintBottom_toTopOf="@id/bottom_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar">
@@ -108,6 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="24dp" />
 
+            <!-- ★ 내부 클래스는 $ 기호로 참조 -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_map"
                 android:layout_width="match_parent"
@@ -117,20 +118,12 @@
                 app:cardCornerRadius="40dp"
                 app:cardElevation="2dp">
 
-                <FrameLayout
+                <view
+                    android:id="@+id/seoul_map"
+                    class="com.example.day2day.presentation.recommend.flow.MapSelectionActivity$SeoulMapView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="16dp">
-
-                    <ImageView
-                        android:id="@+id/iv_map_sample"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="지도"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/seoul" />
-                </FrameLayout>
+                    android:padding="16dp" />
             </androidx.cardview.widget.CardView>
 
             <androidx.cardview.widget.CardView
@@ -210,7 +203,7 @@
                     android:id="@+id/tv_selected_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="경기"
+                    android:text="-"
                     android:textColor="#FFE8506A"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -224,10 +217,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="#FFFAF5F0"
-        android:paddingStart="20dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="20dp"
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
@@ -235,9 +228,10 @@
         <Button
             android:id="@+id/btn_map_selection_confirm"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="52dp"
             android:backgroundTint="#FFE8506A"
-            android:text="경기 코스 추천받기"
+            android:enabled="false"
+            android:text="지역을 선택해주세요"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
