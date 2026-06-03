@@ -21,6 +21,7 @@ public class CoursePlace {
 
   public String courseId;
   public String placeName;
+  public String imageUrl;
   public double latitude;
   public double longitude;
   public int orderIndex;
@@ -32,6 +33,23 @@ public class CoursePlace {
       String courseId, String placeName, double latitude, double longitude, int orderIndex) {
     this.courseId = courseId;
     this.placeName = placeName;
+    this.imageUrl = null;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.orderIndex = orderIndex;
+  }
+
+  @Ignore
+  public CoursePlace(
+      String courseId,
+      String placeName,
+      String imageUrl,
+      double latitude,
+      double longitude,
+      int orderIndex) {
+    this.courseId = courseId;
+    this.placeName = placeName;
+    this.imageUrl = imageUrl;
     this.latitude = latitude;
     this.longitude = longitude;
     this.orderIndex = orderIndex;

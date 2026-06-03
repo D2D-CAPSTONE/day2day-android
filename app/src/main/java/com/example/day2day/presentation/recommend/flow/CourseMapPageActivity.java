@@ -32,6 +32,7 @@ import com.naver.maps.map.OnMapReadyCallback;
 import com.naver.maps.map.overlay.Marker;
 import com.naver.maps.map.overlay.PathOverlay;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,6 +49,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
   private CourseAdapter adapter;
   private final List<Course> courseList = new ArrayList<>();
   private Course selectedCourse;
+  private ArrayList<String> selectedMoods;
 
   private enum PlaceType {
     MEAL,
@@ -55,7 +57,6 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     ACTIVITY,
     OTHER
   }
-
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,15 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
           }
           Intent intent = new Intent(CourseMapPageActivity.this, CourseDetailPageActivity.class);
           intent.putExtra(CourseContract.EXTRA_COURSE_ID, selectedCourse.courseId);
+
+          String keyword = getIntent().getStringExtra("FILTER_KEYWORD");
+          ArrayList<String> moods = getIntent().getStringArrayListExtra("FILTER_MOODS");
+          String sortOrder = getIntent().getStringExtra("FILTER_SORT");
+
+          intent.putExtra("FILTER_KEYWORD", keyword);
+          intent.putStringArrayListExtra("FILTER_MOODS", moods);
+          intent.putExtra("FILTER_SORT", sortOrder);
+
           startActivity(intent);
         });
 
@@ -95,6 +105,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     mapFragment.getMapAsync(this);
 
     String keyword = getIntent().getStringExtra("FILTER_KEYWORD");
+    selectedMoods = getIntent().getStringArrayListExtra("FILTER_MOODS");
     if (keyword == null || keyword.isEmpty()) {
       keyword = "강남역 데이트"; // 기본값
     }
@@ -103,31 +114,36 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
   }
 
   private void fetchCoursesIndividually(String baseKeyword) {
-    String baseDistrict = baseKeyword.replace(" 데이트", "");
+    String baseDistrict = extractCoreDistrict(baseKeyword.replace(" 데이트", ""));
+    Log.d(TAG, "원래 검색어: " + baseKeyword + " -> 정제된 검색어 베이스: " + baseDistrict);
 
     List<BackendPlaceResponse> allMeals = new ArrayList<>();
     List<BackendPlaceResponse> allCafes = new ArrayList<>();
     List<BackendPlaceResponse> allActivities = new ArrayList<>();
 
+    List<String> activityKeywords = Arrays.asList("영화관", "PC방", "보드카페", "공원", "전시");
+    int totalRequests = 2 + activityKeywords.size();
     AtomicInteger completedRequests = new AtomicInteger(0);
 
     // 1. 식당 검색
     courseEngine.fetchNearbyPlaces(
-        baseDistrict + " 음식점",
+        baseDistrict + " 맛집",
         new NearbyCourseEngine.FetchPlacesCallback() {
           @Override
           public void onSuccess(List<BackendPlaceResponse> places) {
-            Log.d(TAG, "음식점 검색 완료: " + places.size() + "개");
+            Log.d(TAG, "맛집 검색 완료: " + places.size() + "개");
             allMeals.addAll(places);
-            checkAndCombineCourses(
-                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+            if (completedRequests.incrementAndGet() == totalRequests) {
+              combineAndSave(baseKeyword, allMeals, allCafes, allActivities);
+            }
           }
 
           @Override
           public void onFailure(String errorMessage) {
-            Log.e(TAG, "음식점 검색 실패: " + errorMessage);
-            checkAndCombineCourses(
-                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+            Log.e(TAG, "맛집 검색 실패: " + errorMessage);
+            if (completedRequests.incrementAndGet() == totalRequests) {
+              combineAndSave(baseKeyword, allMeals, allCafes, allActivities);
+            }
           }
         });
 
@@ -139,49 +155,75 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
           public void onSuccess(List<BackendPlaceResponse> places) {
             Log.d(TAG, "카페 검색 완료: " + places.size() + "개");
             allCafes.addAll(places);
-            checkAndCombineCourses(
-                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+            if (completedRequests.incrementAndGet() == totalRequests) {
+              combineAndSave(baseKeyword, allMeals, allCafes, allActivities);
+            }
           }
 
           @Override
           public void onFailure(String errorMessage) {
             Log.e(TAG, "카페 검색 실패: " + errorMessage);
-            checkAndCombineCourses(
-                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
+            if (completedRequests.incrementAndGet() == totalRequests) {
+              combineAndSave(baseKeyword, allMeals, allCafes, allActivities);
+            }
           }
         });
 
-    // 3. 놀거리 검색
-    courseEngine.fetchNearbyPlaces(
-        baseDistrict + " 놀거리",
-        new NearbyCourseEngine.FetchPlacesCallback() {
-          @Override
-          public void onSuccess(List<BackendPlaceResponse> places) {
-            Log.d(TAG, "놀거리 검색 완료: " + places.size() + "개");
-            allActivities.addAll(places);
-            checkAndCombineCourses(
-                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
-          }
+    // 3. 여러 놀거리 카테고리 동시 검색
+    for (String activityKeyword : activityKeywords) {
+      courseEngine.fetchNearbyPlaces(
+          baseDistrict + " " + activityKeyword,
+          new NearbyCourseEngine.FetchPlacesCallback() {
+            @Override
+            public void onSuccess(List<BackendPlaceResponse> places) {
+              Log.d(TAG, activityKeyword + " 검색 완료: " + places.size() + "개");
+              allActivities.addAll(places);
+              if (completedRequests.incrementAndGet() == totalRequests) {
+                combineAndSave(baseKeyword, allMeals, allCafes, allActivities);
+              }
+            }
 
-          @Override
-          public void onFailure(String errorMessage) {
-            Log.e(TAG, "놀거리 검색 실패: " + errorMessage);
-            checkAndCombineCourses(
-                baseKeyword, allMeals, allCafes, allActivities, completedRequests);
-          }
-        });
+            @Override
+            public void onFailure(String errorMessage) {
+              Log.e(TAG, activityKeyword + " 검색 실패: " + errorMessage);
+              if (completedRequests.incrementAndGet() == totalRequests) {
+                combineAndSave(baseKeyword, allMeals, allCafes, allActivities);
+              }
+            }
+          });
+    }
   }
 
-  private void checkAndCombineCourses(
+  private void combineAndSave(
       String keyword,
-      List<BackendPlaceResponse> meals,
-      List<BackendPlaceResponse> cafes,
-      List<BackendPlaceResponse> activities,
-      AtomicInteger completedRequests) {
-    if (completedRequests.incrementAndGet() == 3) {
-      Log.d(TAG, "모든 개별 검색 완료. 조합 시작.");
-      saveCoursesToDatabaseStrict(keyword, meals, cafes, activities);
+      List<BackendPlaceResponse> allMeals,
+      List<BackendPlaceResponse> allCafes,
+      List<BackendPlaceResponse> allActivities) {
+    Log.d(TAG, "모든 개별 검색 완료. 조합 시작.");
+    saveCoursesToDatabaseStrict(keyword, allMeals, allCafes, allActivities);
+  }
+
+  private String extractCoreDistrict(String fullAddress) {
+    if (fullAddress == null || fullAddress.isEmpty()) return "강남역";
+    String[] parts = fullAddress.trim().split("\\s+");
+    if (parts.length == 0) return fullAddress;
+    String lastPart = parts[parts.length - 1];
+    String guPart = null;
+    for (int i = parts.length - 1; i >= 0; i--) {
+      if (parts[i].endsWith("구")) {
+        guPart = parts[i];
+        break;
+      }
     }
+    if (lastPart.endsWith("동")
+        || lastPart.endsWith("역")
+        || lastPart.endsWith("로")
+        || lastPart.endsWith("길")) {
+      return lastPart;
+    } else if (guPart != null) {
+      return guPart;
+    }
+    return lastPart;
   }
 
   private void saveCoursesToDatabaseStrict(
@@ -190,17 +232,9 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
       List<BackendPlaceResponse> rawCafes,
       List<BackendPlaceResponse> rawActivities) {
 
-    List<BackendPlaceResponse> meals = new ArrayList<>();
-    for (BackendPlaceResponse p : rawMeals)
-      if (getPlaceType(p.getCategory()) == PlaceType.MEAL) meals.add(p);
-
-    List<BackendPlaceResponse> cafes = new ArrayList<>();
-    for (BackendPlaceResponse p : rawCafes)
-      if (getPlaceType(p.getCategory()) == PlaceType.CAFE) cafes.add(p);
-
-    List<BackendPlaceResponse> activities = new ArrayList<>();
-    for (BackendPlaceResponse p : rawActivities)
-      if (getPlaceType(p.getCategory()) == PlaceType.ACTIVITY) activities.add(p);
+    List<BackendPlaceResponse> meals = filterByCategory(rawMeals, PlaceType.MEAL);
+    List<BackendPlaceResponse> cafes = filterByCategory(rawCafes, PlaceType.CAFE);
+    List<BackendPlaceResponse> activities = filterByCategory(rawActivities, PlaceType.ACTIVITY);
 
     Log.d(TAG, "--- 최종 카테고리 필터링 완료 ---");
     Log.d(
@@ -223,7 +257,6 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     int maxCourses = Math.min(3, Math.min(meals.size(), Math.min(cafes.size(), activities.size())));
 
     for (int i = 0; i < maxCourses; i++) {
-      // 순서: 식사 -> 카페 -> 놀거리
       List<BackendPlaceResponse> coursePlacesResponse =
           List.of(meals.get(i), cafes.get(i), activities.get(i));
 
@@ -246,6 +279,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
               new CoursePlace(
                   newCourseId,
                   place.getName(),
+                  place.getImageUrl(),
                   Double.parseDouble(place.getY()),
                   Double.parseDouble(place.getX()),
                   j));
@@ -278,26 +312,72 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
         });
   }
 
-  private PlaceType getPlaceType(String category) {
-    if (category == null) return PlaceType.OTHER;
+  private List<BackendPlaceResponse> filterByCategory(
+      List<BackendPlaceResponse> places, PlaceType type) {
+    List<BackendPlaceResponse> categorized = new ArrayList<>();
+    for (BackendPlaceResponse p : places) {
+      PlaceType actualType = getPlaceType(p);
+      if (actualType == type) {
+        categorized.add(p);
+      }
+    }
+    return categorized;
+  }
+
+  private PlaceType getPlaceType(BackendPlaceResponse place) {
+    String category = place.getCategory() != null ? place.getCategory().toString() : "";
+    String name = place.getName() != null ? place.getName() : "";
+
     if (category.contains("한식")
         || category.contains("일식")
         || category.contains("중식")
         || category.contains("양식")
         || category.contains("파스타")
         || category.contains("음식점")
-        || category.contains("레스토랑")) {
+        || category.contains("식당")
+        || category.contains("고기")
+        || category.contains("레스토랑")
+        || category.contains("이탈리안")
+        || category.contains("돈까스")
+        || category.contains("냉면")
+        || category.contains("해물")
+        || category.contains("수제비")
+        || category.contains("국밥")
+        || category.contains("햄버거")) {
       return PlaceType.MEAL;
-    } else if (category.contains("카페") || category.contains("디저트")) {
+    } else if (category.contains("카페")
+        || category.contains("디저트")
+        || category.contains("커피")
+        || category.contains("베이커리")
+        || category.contains("다방")
+        || category.contains("테마카페")) {
       return PlaceType.CAFE;
     } else if (category.contains("영화관")
         || category.contains("전시")
         || category.contains("공원")
+        || category.contains("명소")
         || category.contains("오락")
         || category.contains("술집")
+        || category.contains("주점")
+        || category.contains("노래")
+        || category.contains("게임")
+        || category.contains("놀거리")
+        || category.contains("보드카페")
         || category.contains("PC방")) {
       return PlaceType.ACTIVITY;
     }
+
+    if (name.contains("식당") || name.contains("레스토랑") || name.contains("밥집")) {
+      return PlaceType.MEAL;
+    } else if (name.contains("카페") || name.contains("커피")) {
+      return PlaceType.CAFE;
+    } else if (name.contains("PC")
+        || name.contains("노래")
+        || name.contains("게임")
+        || name.contains("공원")) {
+      return PlaceType.ACTIVITY;
+    }
+
     return PlaceType.OTHER;
   }
 

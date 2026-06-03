@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 
 @Database(
     entities = {Course.class, CoursePlace.class, PopularCourse.class, Favorite.class, Record.class},
-    version = 3,
+    version = 4,
     exportSchema = false)
 public abstract class CourseDatabase extends RoomDatabase {
   private static volatile CourseDatabase instance;
