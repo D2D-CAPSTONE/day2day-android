@@ -15,7 +15,6 @@ import com.example.day2day.data.CourseContract;
 import com.example.day2day.data.local.CourseDatabase;
 import com.example.day2day.data.local.CourseSeedData;
 import com.example.day2day.data.local.entity.Course;
-import com.example.day2day.data.local.entity.Record;
 import com.example.day2day.presentation.common.CourseCardHelper;
 import com.example.day2day.presentation.recommend.flow.CourseDetailPageActivity;
 import java.util.List;
@@ -53,15 +52,6 @@ public class RecordFragment extends Fragment {
         () -> {
           if (db.courseDao().getCourseCount() == 0) {
             db.courseDao().insertCourses(CourseSeedData.getPopularCourses());
-          }
-          if (db.recordDao().getAllRecords().isEmpty()) {
-            long now = System.currentTimeMillis();
-            db.recordDao()
-                .insertRecord(new Record("popular_001", now - 86400000L * 3, "홍대 데이트 다녀옴"));
-            db.recordDao()
-                .insertRecord(new Record("popular_002", now - 86400000L * 7, "한강 피크닉 최고"));
-            db.recordDao()
-                .insertRecord(new Record("popular_007", now - 86400000L * 14, "남산 야경 진짜 예뻤음"));
           }
 
           List<Course> courses = db.recordDao().getRecordedCourses();

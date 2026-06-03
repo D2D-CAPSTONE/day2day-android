@@ -16,8 +16,9 @@ public interface PopularCourseDao {
   @Query(
       "SELECT c.* FROM courses c "
           + "INNER JOIN popular_courses pc ON c.courseId = pc.courseId "
-          + "ORDER BY c.courseId ASC")
-  List<Course> getPopularCourses();
+          + "ORDER BY c.courseId ASC "
+          + "LIMIT :limit OFFSET :offset")
+  List<Course> getPopularCoursesPaged(int limit, int offset);
 
   @Query("SELECT COUNT(*) FROM popular_courses")
   int getPopularCourseCount();
