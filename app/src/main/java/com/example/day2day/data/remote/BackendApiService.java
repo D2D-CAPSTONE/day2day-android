@@ -13,9 +13,16 @@ public interface BackendApiService {
 
   @GET("/api/naver-map/coordinate")
   Call<List<BackendPlaceResponse>> searchNaverMapByCoordinate(
-      @Query("q") String query, @Query("x") String longitude, @Query("y") String latitude);
+      @Query("query") String query, @Query("x") String longitude, @Query("y") String latitude);
 
   @GET("/api/kakao-map/search")
   Call<List<BackendPlaceResponse>> searchKakaoMap(
       @Query("q") String query, @Query("page") Integer page);
+
+  @GET("/api/kakao-map/coordinate")
+  Call<KakaoCoordinateResponse> searchKakaoMapByCoordinate(
+      @Query("query") String query,
+      @Query("x") String longitude,
+      @Query("y") String latitude,
+      @Query("radius") Integer radius);
 }
