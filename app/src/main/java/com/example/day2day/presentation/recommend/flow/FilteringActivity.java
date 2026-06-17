@@ -4,12 +4,14 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.core.app.ActivityCompat;
 import com.example.day2day.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -121,6 +123,7 @@ public class FilteringActivity extends AppCompatActivity {
       useCoordinateSearch = true;
     }
 
+    applyMoodChipColors();
     updateLocationUi();
 
     useCurrentLocationButton.setOnClickListener(v -> useCurrentLocation());
@@ -145,6 +148,31 @@ public class FilteringActivity extends AppCompatActivity {
 
           startActivity(intent);
         });
+  }
+
+  private void applyMoodChipColors() {
+    ColorStateList chipBackgroundColor =
+        AppCompatResources.getColorStateList(this, R.color.chip_bg_mood);
+    ColorStateList chipStrokeColor =
+        AppCompatResources.getColorStateList(this, R.color.chip_stroke_mood);
+    ColorStateList chipTextColor =
+        AppCompatResources.getColorStateList(this, R.color.chip_text_mood);
+
+    for (int chipId : MOOD_CHIP_IDS) {
+      Chip chip = chipGroupMood.findViewById(chipId);
+      if (chip == null) {
+        continue;
+      }
+      if (chipBackgroundColor != null) {
+        chip.setChipBackgroundColor(chipBackgroundColor);
+      }
+      if (chipStrokeColor != null) {
+        chip.setChipStrokeColor(chipStrokeColor);
+      }
+      if (chipTextColor != null) {
+        chip.setTextColor(chipTextColor);
+      }
+    }
   }
 
   private void resetFilters() {

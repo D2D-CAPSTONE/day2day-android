@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -23,6 +22,7 @@ import com.example.day2day.data.local.entity.CoursePlace;
 import com.example.day2day.data.remote.BackendPlaceResponse;
 import com.example.day2day.data.remote.NearbyCourseEngine;
 import com.example.day2day.presentation.common.NavigationBarInsetHelper;
+import com.google.android.material.button.MaterialButton;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraAnimation;
 import com.naver.maps.map.CameraPosition;
@@ -87,7 +87,7 @@ public class CourseMapPageActivity extends AppCompatActivity implements OnMapRea
     }
 
     View rootView = findViewById(android.R.id.content);
-    Button nextButton = findViewById(R.id.btn_course_map_page_next);
+    MaterialButton nextButton = findViewById(R.id.btn_course_map_page_next);
     NavigationBarInsetHelper.applyBottomInset(rootView, nextButton);
     nextButton.setOnClickListener(
         v -> {

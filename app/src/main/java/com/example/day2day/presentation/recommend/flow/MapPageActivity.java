@@ -8,7 +8,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +21,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.CancellationTokenSource;
+import com.google.android.material.button.MaterialButton;
 import com.naver.maps.geometry.LatLng;
 import com.naver.maps.map.CameraAnimation;
 import com.naver.maps.map.CameraUpdate;
@@ -35,11 +36,12 @@ public class MapPageActivity extends AppCompatActivity implements OnMapReadyCall
   private static final double DEFAULT_LATITUDE = 37.5666102;
   private static final double DEFAULT_LONGITUDE = 126.9783881;
   private static final long MIN_LOADING_VISIBLE_MS = 900L;
+  private static final int MAP_CONTROL_BOTTOM_GAP_DP = 16;
 
   private FusedLocationSource locationSource;
   private FusedLocationProviderClient fusedLocationClient;
   private NaverMap naverMap;
-  private Button nextButton;
+  private MaterialButton nextButton;
   private View loadingOverlay;
   private ProgressBar loadingProgressBar;
   private TextView loadingTextView;
@@ -62,6 +64,9 @@ public class MapPageActivity extends AppCompatActivity implements OnMapReadyCall
     loadingTextView = findViewById(R.id.tv_map_page_loading);
 
     NavigationBarInsetHelper.applyBottomInset(rootView, nextButton);
+    nextButton.addOnLayoutChangeListener(
+        (view, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) ->
+            applyMapControlPadding());
     nextButton.setText("필터 고르기");
     nextButton.setOnClickListener(
         v -> {
@@ -97,6 +102,7 @@ public class MapPageActivity extends AppCompatActivity implements OnMapReadyCall
     naverMap.getUiSettings().setLocationButtonEnabled(true);
     naverMap.getLocationOverlay().setVisible(true);
     naverMap.setLocationTrackingMode(LocationTrackingMode.NoFollow);
+    nextButton.post(this::applyMapControlPadding);
 
     if (hasResolvedCurrentLocation) {
       moveCameraToCurrentLocation();
@@ -216,6 +222,22 @@ public class MapPageActivity extends AppCompatActivity implements OnMapReadyCall
     naverMap.setLocationTrackingMode(LocationTrackingMode.Follow);
   }
 
+  private void applyMapControlPadding() {
+    if (naverMap == null || nextButton == null) {
+      return;
+    }
+
+    ViewGroup.MarginLayoutParams params =
+        (ViewGroup.MarginLayoutParams) nextButton.getLayoutParams();
+    int bottomPadding =
+        nextButton.getHeight() + params.bottomMargin + dpToPx(MAP_CONTROL_BOTTOM_GAP_DP);
+    naverMap.setContentPadding(0, 0, 0, bottomPadding);
+  }
+
+  private int dpToPx(int dp) {
+    return Math.round(dp * getResources().getDisplayMetrics().density);
+  }
+
   private void showLoading(String message) {
     loadingToken++;
     loadingShownAtMs = SystemClock.elapsedRealtime();
@@ -223,7 +245,6 @@ public class MapPageActivity extends AppCompatActivity implements OnMapReadyCall
     loadingProgressBar.setVisibility(View.VISIBLE);
     loadingTextView.setText(message);
     nextButton.setEnabled(false);
-    nextButton.setAlpha(0.6f);
   }
 
   private void hideLoading() {
@@ -246,14 +267,12 @@ public class MapPageActivity extends AppCompatActivity implements OnMapReadyCall
 
     loadingOverlay.setVisibility(View.GONE);
     nextButton.setEnabled(true);
-    nextButton.setAlpha(1f);
   }
 
   private void showLocationUnavailable(String message) {
     loadingToken++;
     loadingOverlay.setVisibility(View.GONE);
     nextButton.setEnabled(false);
-    nextButton.setAlpha(0.6f);
     Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
   }
 }
